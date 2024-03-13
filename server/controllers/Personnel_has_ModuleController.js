@@ -1,4 +1,4 @@
-const {Personnel_has_module, Personnel, Module, Filiere, Groupe} = require('../models')
+const {Personnel_has_Module, Personnel, Module, Filiere, Groupe} = require('../models')
 
 const createAssignment = async (req, res) => {
   try {
@@ -13,21 +13,21 @@ const createAssignment = async (req, res) => {
     for(let i = 0 ; i < ressources.length ; i++){
       const {code_module, code_filiere, id_groupe} = ressources[i];
 
-      const moduleExists = Module.findByPk(code_module);
-      const filiereExists = Filiere.findByPk(code_filiere);
-      const groupeExists = Filiere.findByPk(id_groupe);
+      const moduleExists = await Module.findByPk(code_module);
+      const filiereExists = await Filiere.findByPk(code_filiere);
+      const groupeExists = await Groupe.findByPk(id_groupe);
 
   
       if (!moduleExists || !filiereExists || !groupeExists ) {
         return res.send(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
       }
 
-      await Personnel_has_module.create({
-        personnel_cin,
-        code_module,
-        code_filiere,
-        id_groupe
-      }) 
+      await Personnel_has_Module.create({
+        Personnel_CIN: personnel_cin,
+        Module_codeModule: code_module,
+        Filiere_codeFil: code_filiere,
+        Groupe_idGrp: id_groupe
+      })
       
     }
     res.status(201).json({message : 'assignation réussite !'});
@@ -49,7 +49,7 @@ const getAssignmentsByPersonnel = async (req, res) => {
       }
 
       // Récupérez toutes les instances de Personnel_has_Module associées au personnel
-      const assignments = await Personnel_has_module.findAll({
+      const assignments = await Personnel_has_Module.findAll({
           where: { personnel_cin },
           include: [
               { model: Module, as: 'Module', attributes: ['codeModule', 'nomModule'] },
@@ -82,7 +82,7 @@ const updateAssignment = async (req, res) => {
     }
 
     // Supprimez toutes les affectations existantes pour ce membre du personnel
-    await Personnel_has_module.destroy({
+    await Personnel_has_Module.destroy({
       where: { personnel_cin }
     });
 
@@ -98,7 +98,7 @@ const updateAssignment = async (req, res) => {
         return res.send(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
       }
 
-      await Personnel_has_module.create({
+      await Personnel_has_Module.create({
         personnel_cin,
         code_module,
         code_filiere,
@@ -118,7 +118,7 @@ const deleteAssignment = async (req, res) => {
   const { personnel_cin } = req.params;
 
   const personnelExists = await Personnel.findByPk(personnel_cin);
-  const personnelHasModuleExists = await Personnel_has_module.findByPk(personnel_cin);
+  const personnelHasModuleExists = await Personnel_has_Module.findByPk(personnel_cin);
 
   if (!personnelExists) {
     return res.send(400).json({message : "Personnel non trouvé !"})
@@ -128,7 +128,7 @@ const deleteAssignment = async (req, res) => {
     return res.send(400).json({messgae : "Ce personnel n'a aucune assignation !"})
   }
 
-  await Personnel_has_module.destroy({
+  await Personnel_has_Module.destroy({
     where: { personnel_cin }
   });
 
