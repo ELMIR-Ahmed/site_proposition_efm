@@ -1,4 +1,4 @@
-    module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
     const PassageEFM = sequelize.define('PassageEFM', {
         idPassage: {
             type: DataTypes.INTEGER,
@@ -34,6 +34,9 @@
             allowNull: false
         },
         observation: DataTypes.STRING(2000)
+    },{
+        tableName : "passageefm",
+        timestamps: false // Désactiver les horodatages automatiques
     });
 
     PassageEFM.associate = (models) => {
@@ -50,4 +53,4 @@
     };
 
     return PassageEFM;
-    };
+};

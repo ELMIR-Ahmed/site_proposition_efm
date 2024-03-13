@@ -50,7 +50,10 @@ const updatePersonnel = async (req, res) => {
         }
         throw new Error('Personnel non trouvé.');
     } catch (error) {
-        console.error(error);
+        if (error) {
+            return res.json({ messsage : error.message })
+        }
+        // console.error(error);
         res.status(500).json({ message: 'Une erreur est survenue lors de la mise à jour du personnel.' });
     }
 }

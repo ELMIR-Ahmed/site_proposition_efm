@@ -13,7 +13,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         }
+    },{
+        tableName : "filiere",
+        timestamps: false // Désactiver les horodatages automatiques
     });
 
     return Filiere;
 };
+

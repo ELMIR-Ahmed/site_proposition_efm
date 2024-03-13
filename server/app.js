@@ -6,7 +6,7 @@ const personnelRoutes = require('./routes/PersonnelRoutes')
 
 app.use(express.json())
 
-app.use(personnelRoutes);
+app.use('/personnel', personnelRoutes);
 
 const port = process.env.PORT || 7000; // Utilisation de la variable d'environnement PORT, sinon le port 7000 par défaut
 

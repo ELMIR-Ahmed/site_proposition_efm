@@ -4,10 +4,10 @@ const router = express.Router();
 
 const personnelController = require('../controllers/PersonnelController');
 
-router.get('/personnel/:CIN', personnelController.getPersonnelByCIN);
-router.get('/personnel', personnelController.getAllPersonnel);
-router.post('/createPersonnel', personnelController.createPersonnel);
-router.delete('/deletePersonnel/:CIN', personnelController.deletePersonnel);
-router.put('/updatePersonnel/:CIN', personnelController.updatePersonnel);
+router.get('/:CIN', personnelController.getPersonnelByCIN);
+router.get('/', personnelController.getAllPersonnel);
+router.post('/', personnelController.createPersonnel);
+router.delete('/:CIN', personnelController.deletePersonnel);
+router.put('/:CIN', personnelController.updatePersonnel);
 
 module.exports = router; 
