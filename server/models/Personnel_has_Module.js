@@ -18,15 +18,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'codeModule'
             }
         },
-        Filiere_codeFil: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            primaryKey: true,
-            references: {
-                model: 'Filiere',
-                key: 'codeFil'
-            }
-        },
         Groupe_idGrp: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -38,8 +29,15 @@ module.exports = (sequelize, DataTypes) => {
         }
     },{
         tableName : "personnel_has_module",
-        timestamps: false // Désactiver les horodatages automatiques
+        timestamps: false
     });
 
+    Personnel_has_Module.associate = (models) => {
+        Personnel_has_Module.belongsTo(models.Personnel, { foreignKey: 'Personnel_CIN', as: 'Personnel' });
+        Personnel_has_Module.belongsTo(models.Module, { foreignKey: 'Module_codeModule', as: 'Module' });
+        Personnel_has_Module.belongsTo(models.Groupe, { foreignKey: 'Groupe_idGrp', as: 'Groupe' });
+    };
+
     return Personnel_has_Module;
+
 };

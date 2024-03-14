@@ -1,4 +1,4 @@
-const {Personnel_has_Module, Personnel, Module, Filiere, Groupe} = require('../models')
+const {Personnel_has_Module, Personnel, Module, Groupe} = require('../models')
 
 const createAssignment = async (req, res) => {
   try {
@@ -11,21 +11,19 @@ const createAssignment = async (req, res) => {
 
     // itérer sur le tableau des ressouces (modules, filiere, groupe) envoyé du coté client :
     for(let i = 0 ; i < ressources.length ; i++){
-      const {code_module, code_filiere, id_groupe} = ressources[i];
+      const {code_module, id_groupe} = ressources[i];
 
       const moduleExists = await Module.findByPk(code_module);
-      const filiereExists = await Filiere.findByPk(code_filiere);
       const groupeExists = await Groupe.findByPk(id_groupe);
 
   
-      if (!moduleExists || !filiereExists || !groupeExists ) {
-        return res.send(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
+      if ( (moduleExists === false) || (groupeExists === false) ) {
+        return res.status(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
       }
 
       await Personnel_has_Module.create({
         Personnel_CIN: personnel_cin,
         Module_codeModule: code_module,
-        Filiere_codeFil: code_filiere,
         Groupe_idGrp: id_groupe
       })
       
@@ -40,20 +38,19 @@ const createAssignment = async (req, res) => {
 
 const getAssignmentsByPersonnel = async (req, res) => {
   try {
-      const { personnel_cin } = req.params;
+      const { CIN } = req.params;
 
       // Vérifiez si le personnel existe
-      const personnel = await Personnel.findByPk(personnel_cin);
+      const personnel = await Personnel.findByPk(CIN);
       if (!personnel) {
           return res.status(400).json({ message: 'Personnel non trouvé.' });
       }
 
       // Récupérez toutes les instances de Personnel_has_Module associées au personnel
       const assignments = await Personnel_has_Module.findAll({
-          where: { personnel_cin },
+          where: { Personnel_CIN : CIN },
           include: [
               { model: Module, as: 'Module', attributes: ['codeModule', 'nomModule'] },
-              { model: Filiere, as: 'Filiere', attributes: ['codeFil', 'nomFil'] },
               { model: Groupe, as: 'Groupe', attributes: ['idGrp', 'nomGrp'] }
           ]
       });
@@ -61,7 +58,6 @@ const getAssignmentsByPersonnel = async (req, res) => {
       // Transformez les données pour ne renvoyer que les informations nécessaires
       const result = assignments.map(assignment => ({
           module: assignment.Module,
-          filiere: assignment.Filiere,
           groupe: assignment.Groupe
       }));
 
@@ -88,20 +84,18 @@ const updateAssignment = async (req, res) => {
 
     // Créez les nouvelles affectations
     for(let i = 0 ; i < newAssignments.length ; i++){
-      const {code_module, code_filiere, id_groupe} = newAssignments[i];
+      const {code_module, id_groupe} = newAssignments[i];
 
       const moduleExists = Module.findByPk(code_module);
-      const filiereExists = Filiere.findByPk(code_filiere);
       const groupeExists = Filiere.findByPk(id_groupe);
 
-      if (!moduleExists || !filiereExists || !groupeExists ) {
+      if (!moduleExists || !groupeExists ) {
         return res.send(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
       }
 
       await Personnel_has_Module.create({
         personnel_cin,
         code_module,
-        code_filiere,
         id_groupe
       }) 
     }
@@ -115,21 +109,21 @@ const updateAssignment = async (req, res) => {
 
 
 const deleteAssignment = async (req, res) => {
-  const { personnel_cin } = req.params;
-
-  const personnelExists = await Personnel.findByPk(personnel_cin);
-  const personnelHasModuleExists = await Personnel_has_Module.findByPk(personnel_cin);
+  const { CIN } = req.params;
+  
+  const personnelExists = await Personnel.findByPk(CIN);
+  const personnelHasModuleExists = await Personnel_has_Module.findOne(CIN);
 
   if (!personnelExists) {
-    return res.send(400).json({message : "Personnel non trouvé !"})
+    return res.status(400).json({message : "Personnel non trouvé !"})
   }
 
   if (!personnelHasModuleExists) {
-    return res.send(400).json({messgae : "Ce personnel n'a aucune assignation !"})
+    return res.status(400).json({message : "Ce personnel n'a aucune assignation !"})
   }
 
   await Personnel_has_Module.destroy({
-    where: { personnel_cin }
+    where: { CIN }
   });
 
   res.status(200).json({message : 'Affectations supprimées avec succès !'});
