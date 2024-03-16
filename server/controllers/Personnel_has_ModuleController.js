@@ -41,8 +41,12 @@ const getAssignmentsByPersonnel = async (req, res) => {
       const { CIN } = req.params;
 
       const personnel = await Personnel.findByPk(CIN);
+      const personnelHasModuleExists = await Personnel_has_Module.findOne({where : { Personnel_CIN : CIN }})
       if (!personnel) {
           return res.status(400).json({ message: 'Personnel non trouvé.' });
+      }
+      if (!personnelHasModuleExists) {
+        return res.status(400).json({ message : "Ce personnel n'a aucune assignation !" })
       }
 
       const assignments = await Personnel_has_Module.findAll({
@@ -54,31 +58,34 @@ const getAssignmentsByPersonnel = async (req, res) => {
       });
 
       // Création d'un objet pour stocker les modules et leurs groupes associés :
-      const modulesAndGroupes = {}
+      const modulesAndGroupes = []
+      for (let i = 0; i < assignments.length; i++) {
+        const module = assignments[i].Module;
+        const groupe = assignments[i].Groupe;
 
-      assignments.forEach(assignement => {
-        const module = assignement.Module;
-        const groupe = assignement.Groupe;
-
-        // Si le module n'est pas encore dans l'objet, ajoutez-le avec le groupe associé :
-        if (!modulesAndGroupes[module.codeModule]) {
-          modulesAndGroupes[module.codeModule] = {
-            codeModule: module.codeModule,
-            nomModule: module.nomModule,
-            groupes: [groupe]
-          }
+        // Trouver l'index du module dans modulesAndGroupes
+        const index = modulesAndGroupes.findIndex(m => m.codeModule === module.codeModule);
+        if (index === -1) {
+          // Si le module n'est pas encore dans l'objet, ajoutez-le avec le groupe associé :
+          modulesAndGroupes.push(
+            {
+              codeModule: module.codeModule,
+              nomModule: module.nomModule,
+              groupes: [groupe]
+            }
+          )
         } else {
           // Si le module est déjà dans l'objet, ajoutez simplement le groupe associé :
-          modulesAndGroupes[module.codeModule].groupes.push(groupe);
+          modulesAndGroupes[index].groupes.push(groupe);
         }
-      });
+      }
       res.status(200).json(modulesAndGroupes);
   } catch (error) {
       res.status(500).json({ message: error.message });
   }
 };
 
-/* pour modifier il suffit de  */
+/* pour modifier il suffit de  syu*/
 
 // const updateAssignment = async (req, res) => {
 //   try {
