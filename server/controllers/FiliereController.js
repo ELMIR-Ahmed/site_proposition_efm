@@ -45,6 +45,7 @@ const deleteFiliere = async (req, res) => {
       return res.status(400).json({ message : "Filière non trouvée !" })
     }
     await Filiere.destroy({ where : {codeFil : codeFil} })
+    res.status(200).json({ message : "Filière supprimée avec succès !" })
   } catch (error) {
     
   }
