@@ -1,4 +1,4 @@
-const {Personnel_has_module, Personnel, Module, Filiere, Groupe} = require('../models')
+const {Personnel_has_Module, Personnel, Module, Groupe} = require('../models')
 
 const createAssignment = async (req, res) => {
   try {
@@ -11,23 +11,21 @@ const createAssignment = async (req, res) => {
 
     // itérer sur le tableau des ressouces (modules, filiere, groupe) envoyé du coté client :
     for(let i = 0 ; i < ressources.length ; i++){
-      const {code_module, code_filiere, id_groupe} = ressources[i];
+      const {code_module, id_groupe} = ressources[i];
 
-      const moduleExists = Module.findByPk(code_module);
-      const filiereExists = Filiere.findByPk(code_filiere);
-      const groupeExists = Filiere.findByPk(id_groupe);
+      const moduleExists = await Module.findByPk(code_module);
+      const groupeExists = await Groupe.findByPk(id_groupe);
 
   
-      if (!moduleExists || !filiereExists || !groupeExists ) {
-        return res.send(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
+      if ( (moduleExists === null) || (groupeExists === null) ) {
+        return res.status(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
       }
 
-      await Personnel_has_module.create({
-        personnel_cin,
-        code_module,
-        code_filiere,
-        id_groupe
-      }) 
+      await Personnel_has_Module.create({
+        Personnel_CIN: personnel_cin,
+        Module_codeModule: code_module,
+        Groupe_idGrp: id_groupe
+      })
       
     }
     res.status(201).json({message : 'assignation réussite !'});
@@ -40,40 +38,123 @@ const createAssignment = async (req, res) => {
 
 const getAssignmentsByPersonnel = async (req, res) => {
   try {
-      const { Personnel_CIN } = req.params;
+      const { CIN } = req.params;
 
-      // Vérifiez si le personnel existe
-      const personnel = await Personnel.findByPk(Personnel_CIN);
+      const personnel = await Personnel.findByPk(CIN);
+      const personnelHasModuleExists = await Personnel_has_Module.findOne({where : { Personnel_CIN : CIN }})
       if (!personnel) {
           return res.status(400).json({ message: 'Personnel non trouvé.' });
       }
+      if (!personnelHasModuleExists) {
+        return res.status(400).json({ message : "Ce personnel n'a aucune assignation !" })
+      }
 
-      // Récupérez toutes les instances de Personnel_has_Module associées au personnel
-      const assignments = await Personnel_has_module.findAll({
-          where: { Personnel_CIN },
+      const assignments = await Personnel_has_Module.findAll({
+          where: { Personnel_CIN : CIN },
           include: [
               { model: Module, as: 'Module', attributes: ['codeModule', 'nomModule'] },
-              { model: Filiere, as: 'Filiere', attributes: ['codeFil', 'nomFil'] },
-              { model: Groupe, as: 'Groupe', attributes: ['idGrp', 'nomGrp'] }
+              { model: Groupe, as: 'Groupe', attributes: ['idGrp', 'nomGrp', 'Filiere_codeFil'] }
           ]
       });
 
-      // Transformez les données pour ne renvoyer que les informations nécessaires
-      const result = assignments.map(assignment => ({
-          module: assignment.Module,
-          filiere: assignment.Filiere,
-          groupe: assignment.Groupe
-      }));
+      // Création d'un objet pour stocker les modules et leurs groupes associés :
+      const modulesAndGroupes = []
+      for (let i = 0; i < assignments.length; i++) {
+        const module = assignments[i].Module;
+        const groupe = assignments[i].Groupe;
 
-      res.status(200).json(result);
+        // Trouver l'index du module dans modulesAndGroupes
+        const index = modulesAndGroupes.findIndex(m => m.codeModule === module.codeModule);
+        if (index === -1) {
+          // Si le module n'est pas encore dans l'objet, ajoutez-le avec le groupe associé :
+          modulesAndGroupes.push(
+            {
+              codeModule: module.codeModule,
+              nomModule: module.nomModule,
+              groupes: [groupe]
+            }
+          )
+        } else {
+          // Si le module est déjà dans l'objet, ajoutez simplement le groupe associé :
+          modulesAndGroupes[index].groupes.push(groupe);
+        }
+      }
+      res.status(200).json(modulesAndGroupes);
   } catch (error) {
       res.status(500).json({ message: error.message });
   }
 };
 
+/* pour modifier il suffit de  syu*/
+
+// const updateAssignment = async (req, res) => {
+//   try {
+//     const {personnel_cin, newAssignments} = req.body;
+//     const personnel = await Personnel.findByPk(personnel_cin);
+//     if (!personnel) {
+//         return res.status(400).json({ message: 'Personnel non trouvé.' });
+//     }
+
+//     await Personnel_has_Module.destroy({
+//       where: { personnel_cin }
+//     });
+
+//     for(let i = 0 ; i < newAssignments.length ; i++){
+//       const {code_module, id_groupe} = newAssignments[i];
+
+//       const moduleExists = Module.findByPk(code_module);
+//       const groupeExists = Filiere.findByPk(id_groupe);
+
+//       if (!moduleExists || !groupeExists ) {
+//         return res.send(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
+//       }
+
+    //   await Personnel_has_Module.create({
+    //     personnel_cin,
+//         code_module,
+//         id_groupe
+//       }) 
+//     }
+
+//     res.status(200).json({message : 'Affectations mises à jour avec succès !'});
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+const deleteAssignment = async (req, res) => {
+  try {
+    const {CIN} = req.params
+    const {groupe, module} = req.body
+    const personnelExists = await Personnel.findByPk(CIN)
+    const personnelHasModuleExists = await Personnel_has_Module.findOne({ where : { Personnel_CIN : CIN }});
+    if (personnelExists === null) {
+      return res.status(400).json({ message : "Personnel non trouvé !" })
+    }
+    if (!personnelHasModuleExists) {
+      return res.status(400).json({message : "Ce personnel n'a aucune assignation !"})
+    }
+    if (groupe || module) {
+      if (groupe) {
+        await Personnel_has_Module.destroy({ where : { Groupe_idGrp : groupe } })
+        return res.status(200).json({ message : "Désaffection du groupe avec succes !"})
+      }
+      if (module) {
+        await Personnel_has_Module.destroy({ where : { Module_codeModule : module } })
+        return res.status(200).json({ message : "Désaffection du module avec succes !"})
+      }
+    } else {
+      await Personnel_has_Module.destroy({where: { Personnel_CIN : CIN }});
+      res.status(200).json({message : 'Affectations supprimées avec succès !'});
+    }
+    
+  } catch (error) {
+    res.status(500).json({ message : error.message })
+  }
+}
+
 module.exports = {
   createAssignment, 
   getAssignmentsByPersonnel,
-  deleteAssignment,
-  updateAssignment
+  deleteAssignment
 }

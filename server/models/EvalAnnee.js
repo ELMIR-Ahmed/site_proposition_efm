@@ -1,8 +1,10 @@
+// EvalAnnee.js
+
+'use strict';
 module.exports = (sequelize, DataTypes) => {
     const EvalAnnee = sequelize.define('EvalAnnee', {
         idEval: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             primaryKey: true
         },
         annee: {
@@ -39,11 +41,19 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        observation: DataTypes.STRING(3000)
-    },{
-        tableName : "evalannee",
-        timestamps: false // Désactiver les horodatages automatiques
+        observation: DataTypes.STRING
+    }, {
+        tableName: 'evalannee',
+        timestamps: false
     });
+
+    EvalAnnee.associate = (models) => {
+        EvalAnnee.belongsTo(models.Module, {
+        foreignKey: 'Module_codeModule',
+        onDelete: 'NO ACTION',
+        onUpdate: 'NO ACTION'
+        });
+    };
 
     return EvalAnnee;
 };
