@@ -1,10 +1,13 @@
 // controllers/personnelController.js
 
 const { Personnel } = require('../models');
+const bcrypt = require('bcryptjs')
 
 // Middleware pour créer un nouveau personnel
 const createPersonnel = async (req, res) => {
     try {
+        const hashedPass = await bcrypt.hash(req.body.motDePasse, 12)
+        req.body.motDePasse = hashedPass
         const personnel = await Personnel.create(req.body);
         res.status(201).json({ message: 'Personnel créé avec succes.' });
     } catch (error) {
