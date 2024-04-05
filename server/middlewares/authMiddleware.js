@@ -15,6 +15,8 @@ const checkAuthenticationANDRole =  (fonction) => {
       return res.status(403).json({ "message" : "Accès refusé" })
     }
 
+    next()
+
   } catch (error) {
     res.status(400).json({ "message" : "Authentification requise !" + error})
   }

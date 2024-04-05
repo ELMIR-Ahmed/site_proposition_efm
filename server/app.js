@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('./models'); // Importez votre fichier de modèles Sequelize
 const app = express();
+const cors = require('cors')
 const checkAuthenticationANDRole = require('./middlewares/authMiddleware')
 const personnelRoutes = require('./routes/PersonnelRoutes')
 const Personnel_has_ModuleRoutes = require('./routes/Personnel_has_ModuleRoutes')
@@ -10,6 +11,7 @@ const LoginRoute = require('./routes/loginRoute')
 
 require('dotenv').config()
 
+app.use(cors())
 
 app.use(express.json())
 
