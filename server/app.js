@@ -15,8 +15,6 @@ app.use(cors())
 
 app.use(express.json())
 
-// app.use(authMiddleware)
-
 app.use('/personnel', checkAuthenticationANDRole('directeur'), personnelRoutes);
 app.use('/assignation', checkAuthenticationANDRole('directeur'), Personnel_has_ModuleRoutes);
 app.use('/filiere', checkAuthenticationANDRole('directeur'), FiliereRoutes);

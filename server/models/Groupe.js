@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     Groupe.associate = (models) => {
         Groupe.belongsTo(models.Filiere, {
             foreignKey: 'Filiere_codeFil',
-            onDelete: 'NO ACTION',
+            onDelete: 'CASCADE',
             onUpdate: 'NO ACTION'
         });
     };
