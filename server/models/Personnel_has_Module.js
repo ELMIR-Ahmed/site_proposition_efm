@@ -33,9 +33,9 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Personnel_has_Module.associate = (models) => {
-        Personnel_has_Module.belongsTo(models.Personnel, { foreignKey: 'Personnel_CIN', as: 'Personnel' });
-        Personnel_has_Module.belongsTo(models.Module, { foreignKey: 'Module_codeModule', as: 'Module' });
-        Personnel_has_Module.belongsTo(models.Groupe, { foreignKey: 'Groupe_idGrp', as: 'Groupe' });
+        Personnel_has_Module.belongsTo(models.Personnel, { foreignKey: 'Personnel_CIN', as: 'Personnel', onDelete: 'CASCADE' });
+        Personnel_has_Module.belongsTo(models.Module, { foreignKey: 'Module_codeModule', as: 'Module' ,onDelete: 'CASCADE'});
+        Personnel_has_Module.belongsTo(models.Groupe, { foreignKey: 'Groupe_idGrp', as: 'Groupe' ,onDelete: 'CASCADE'});
     };
 
     return Personnel_has_Module;

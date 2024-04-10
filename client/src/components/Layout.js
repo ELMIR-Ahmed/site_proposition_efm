@@ -8,7 +8,6 @@ import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-// import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -23,9 +22,8 @@ import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import { Avatar, Button } from '@mui/material';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import ofpptIcon from "../assets/icons/ofppt-high-resolution-logo-transparent 2.svg"
-import { deepOrange } from '@mui/material/colors';
 
 
 const drawerWidth = 250;
@@ -158,11 +156,11 @@ export default function Layout(props) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Statistiques', 'Gestion Formateurs', 'Gestion Mod/Grp/Filière', 'Gestion EFMs', 'Audit'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'flex', }}>
+          {/* {['Statistiques', 'Gestion Formateurs', 'Gestion Mod/Grp/Filière', 'Gestion EFMs', 'Audit'].map((text, index) => ( */}
+            <ListItem key={"Statistiques"} disablePadding sx={{ display: 'flex', }}>
               <ListItemButton
                 onClick={()=>{
-                  navigate("/directeur/gestionFormateurs")
+                  navigate("/directeur/statistique")
                 }}
                 sx={{
                   minHeight: 48,
@@ -178,14 +176,10 @@ export default function Layout(props) {
                     justifyContent: 'center',
                   }}
                 >
-                  {index === 0 && <DonutLargeOutlinedIcon/>}
-                  {index === 1 && <PersonOutlineOutlinedIcon />}
-                  {index === 2 && <SchoolOutlinedIcon />}
-                  {index === 3 && <ContentPasteOutlinedIcon />}
-                  {index === 4 && <InventoryOutlinedIcon />}
+                  <DonutLargeOutlinedIcon/>
                 </ListItemIcon>
                 <ListItemText 
-                  primary={text} 
+                  primary={"Statistiques"} 
                   sx={{ 
                     opacity: open ? 0.85 : 0 , 
                     color : 'white',
@@ -193,7 +187,133 @@ export default function Layout(props) {
                 />
               </ListItemButton>
             </ListItem>
-          ))}
+            <ListItem key={"Gestion Formateurs"} disablePadding sx={{ display: 'flex', }}>
+              <ListItemButton
+                onClick={()=>{
+                  navigate("/directeur/gestionFormateurs/Liste")
+                }}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+                
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <PersonOutlineOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={"Gestion Formateurs"} 
+                  sx={{ 
+                    opacity: open ? 0.85 : 0 , 
+                    color : 'white',
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key={"Gestion Mod/Grp/Filière"} disablePadding sx={{ display: 'flex', }}>
+              <ListItemButton
+                onClick={()=>{
+                  navigate("/directeur/gestionModFilGrp/Filiere")
+                }}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+                
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <SchoolOutlinedIcon />
+                  {/*
+                  {index === 3 && <ContentPasteOutlinedIcon />}
+                  {index === 4 && <InventoryOutlinedIcon />} */}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={"Gestion Mod/Grp/Filière"} 
+                  sx={{ 
+                    opacity: open ? 0.85 : 0 , 
+                    color : 'white',
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key={"Gestion EFMs"} disablePadding sx={{ display: 'flex', }}>
+              <ListItemButton
+                onClick={()=>{
+                  navigate("/directeur/gestionEFM")
+                }}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+                
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ContentPasteOutlinedIcon />
+                  {/*
+                  {index === 4 && <InventoryOutlinedIcon />} */}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={"Gestion EFMs"} 
+                  sx={{ 
+                    opacity: open ? 0.85 : 0 , 
+                    color : 'white',
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key={"Audit"} disablePadding sx={{ display: 'flex', }}>
+              <ListItemButton
+                onClick={()=>{
+                  navigate("/directeur/Audit")
+                }}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+                
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <InventoryOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={"Audit"} 
+                  sx={{ 
+                    opacity: open ? 0.85 : 0 , 
+                    color : 'white',
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+            
+          {/* ))} */}
           <div style={{ display: 'flex', height: '85%', justifyContent: 'flex-end', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
               <Avatar 
@@ -241,13 +361,7 @@ export default function Layout(props) {
       <Box 
         component="main" 
         sx={{ 
-          flexGrow: 1, 
-          p: 3, 
-          display : "flex", 
-          alignItems : "center", 
-          justifyContent : "center", 
-          height: '100vh', 
-          width: '100vw',
+          flexGrow: 1,
         }}
       >
         <DrawerHeader />

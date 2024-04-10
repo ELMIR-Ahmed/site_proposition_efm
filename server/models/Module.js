@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     Module.associate = (models) => {
         Module.belongsTo(models.Filiere, {
         foreignKey: 'Filiere_codeFil',
-        onDelete: 'NO ACTION',
+        onDelete: 'CASCADE',
         onUpdate: 'NO ACTION'
         });
     };

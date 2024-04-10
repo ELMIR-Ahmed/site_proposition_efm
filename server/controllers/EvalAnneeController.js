@@ -22,7 +22,7 @@ const evalAnneeController = {
             const evalAnnees = await EvalAnnee.findAll();
             // Réponse avec la liste des évaluations annuelles
             res.status(200).json(evalAnnees);
-        } catch (error) {
+        } catch (error) {   
             // Gestion des erreurs lors de la récupération des évaluations annuelles
             console.error('Erreur lors de la récupération des évaluations annuelles :', error);
             res.status(500).json({ error: 'Erreur lors de la récupération des évaluations annuelles' });
