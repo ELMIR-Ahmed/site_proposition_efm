@@ -4,10 +4,10 @@ const evalAnneeController = require('../controllers/EvalAnneeController');
 
 
 
-router.post('/evaluations', evalAnneeController.createEvalAnnee);
-router.get('/evaluations', evalAnneeController.getAllEvalAnnees);
-router.get('/evaluations/:id', evalAnneeController.getEvalAnneeById);
-router.put('/evaluations/:id', evalAnneeController.updateEvalAnnee);
-router.delete('/evaluations/:id', evalAnneeController.deleteEvalAnnee);
+router.post('/', evalAnneeController.createEvalAnnee);
+router.get('/', evalAnneeController.getAllEvalAnnees);
+router.get('/:id', evalAnneeController.getEvalAnneeById);
+router.put('/:id', evalAnneeController.updateEvalAnnee);
+router.delete('/:id', evalAnneeController.deleteEvalAnnee);
 
 module.exports = router;
