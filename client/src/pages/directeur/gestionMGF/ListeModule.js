@@ -20,6 +20,8 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel'
+import Autocomplete from '@mui/material/Autocomplete'
+import TextField from '@mui/material/TextField'
 
 
 const style = {
@@ -90,6 +92,37 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 }));
 
 
+const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
+  '.MuiInputBase-root' : {
+    height: "37px" /* Remplacez 10px par la valeur de hauteur souhaitée */
+  },
+  '& .MuiInputBase-input': {
+    borderRadius: 4,
+    position: 'relative',
+    height: "9px",
+    top: "-3px",
+    caretColor : "teal",
+    backgroundColor: theme.palette.mode === 'light' ? '#F3F6F9' : '#1A2027',
+    border: '1px solid',
+    borderColor: theme.palette.mode === 'light' ? '#E0E3E7' : '#2D3843',
+    fontSize: 16,
+    padding: '10px 12px',
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  },
+}));
+
+
 function ListerModule() {
   const [newModule, setNewModule] = useState({
     "codeModule" : "",
@@ -100,7 +133,28 @@ function ListerModule() {
   const [filieres, setFilieres] = useState([])
   const [evalAnnee, setEvalAnnee] = useState([])
   const [mergedData, setMergedData] = useState([])
+  const [filiere, setFiliere] = useState([])
 
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    axios.get("http://localhost:7000/filiere", config)
+    .then(res => {
+      const data = res.data;
+      const filiereArray = []
+      for(let i = 0; i < data.length ; i++){
+        filiereArray[i] = {
+          "codeFil" : data[i].codeFil,
+          "nomFil" : data[i].nomFil
+        }
+      }
+      setFiliere(filiereArray)
+    })
+  }, [])
 
   // form modal: 
   const [open, setOpen] = React.useState(false);
@@ -176,9 +230,6 @@ function ListerModule() {
         Authorization: `Bearer ${token}`
       }
     }
-    if (!newModule.codeModule && !newModule.nomModule && !newModule.Filiere_codeFil) {
-      alert("touts les champs sont obligatoires !")
-    }
     await axios.post("http://localhost:7000/module", newModule, config)
     .then(res => {
       console.log(res.data.message);
@@ -191,6 +242,7 @@ function ListerModule() {
     })
     .catch(err => {
       console.log(err.response.data.message)
+      handleOpen()
     })
   }
 
@@ -342,11 +394,28 @@ function ListerModule() {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
-                  <FormControl variant="standard" style={{maxWidth : "100%"}} required >
-                    <InputLabel shrink htmlFor="Filiere" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
+                  <FormControl variant="standard" style={{maxWidth : "100%"}} required>
+                    <br/>
+                    <InputLabel shrink htmlFor="filiere" focused={false} style={{fontSize : "19px"}}>
                       Filière
-                    </InputLabel>
-                    <BootstrapInput value={newModule.Filiere_codeFil} id="Filiere" onChange={(e) => {setNewModule({...newModule, "Filiere_codeFil" : e.target.value})}}/>
+                    </InputLabel>                
+                    <StyledAutocomplete
+                      id="filiere"
+                      sx={{
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          border: '1px solid rgb(0, 128, 128)',
+                          boxShadow:  "0 0 0 0.2rem rgba(0, 128, 128, 0.25)",
+                        },
+                        width : "303px"
+                      }}
+                      disablePortal
+                      options={filiere}
+                      getOptionLabel={(option) => option.nomFil}
+                        value={newModule.Filiere_codeFil ? filiere.find(item => item.codeFil === newModule.Filiere_codeFil) : null} // Récupérer l'objet filière correspondant au code
+                      renderInput={(params) => <TextField {...params} sx={{height:'44px'}} />}
+                      fullWidth
+                      onChange={(_, filiere) => {setNewModule({...newModule, "Filiere_codeFil" : filiere ? filiere.codeFil : ""})}}
+                    />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} md={12} sm={12} style={{marginTop : "25px", borderTop : "1px solid gray", display : "flex", justifyContent : "center", gap : 20}}>
