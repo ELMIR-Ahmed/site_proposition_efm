@@ -58,9 +58,21 @@ const deleteModule = async (req, res) => {
   }
 }
 
+const deleteModules = async (req, res) => {
+  try {
+    const destroyment = await Module.destroy({where : {}})
+    if (destroyment) {
+      return res.status(200).json({message : "Modules supprimés avec succès !"})
+    }
+  } catch (error) {
+    return res.status(400).json({message : "une erreur est survenue lors de la suppression des modules !"})
+  }
+}
+
 module.exports = {
   createModule,
   getModule,
   getModules,
-  deleteModule
+  deleteModule,
+  deleteModules
 }

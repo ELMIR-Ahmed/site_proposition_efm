@@ -5,43 +5,53 @@ module.exports = (sequelize, DataTypes) => {
     const EvalAnnee = sequelize.define('EvalAnnee', {
         idEval: {
             type: DataTypes.INTEGER,
-            primaryKey: true
+            primaryKey: true,
+            autoIncrement: true
         },
         annee: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
         optimise: {
             type: DataTypes.ENUM('TRUE', 'FALSE'),
-            allowNull: false
+            allowNull: true
         },
         dureeGlobale: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
-        dureePresence: DataTypes.INTEGER,
-        dureeFAD: DataTypes.INTEGER,
+        dureePresence: {
+            type : DataTypes.INTEGER,
+            allowNull : true
+        },
+        dureeFAD: {
+            type : DataTypes.INTEGER,
+            allowNull : true
+        },
         typeEval: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         modeEval: {
             type: DataTypes.ENUM('TH', 'TP'),
-            allowNull: false
+            allowNull: true
         },
         dateDebutPropositions: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         },
         dateFinPropositions: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         },
         nbrMinimPropositions: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
-        observation: DataTypes.STRING
+        observation: {
+            type : DataTypes.STRING,
+            allowNull : true
+        },
     }, {
         tableName: 'evalannee',
         timestamps: false
@@ -50,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
     EvalAnnee.associate = (models) => {
         EvalAnnee.belongsTo(models.Module, {
         foreignKey: 'Module_codeModule',
-        onDelete: 'NO ACTION',
+        onDelete: 'CASCADE',
         onUpdate: 'NO ACTION'
         });
     };

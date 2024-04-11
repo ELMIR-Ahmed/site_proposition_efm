@@ -8,7 +8,6 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
@@ -22,6 +21,7 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel'
 import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 
 const style = {
@@ -31,7 +31,6 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 450,
   bgcolor: 'background.paper',
-  // border: '1px solid',
   borderRadius : "10px",
   boxShadow : "0px 0px 11px -2px teal",
   backgroundColor : "rgb(236,238,243)",
@@ -129,12 +128,29 @@ function ListerModule() {
     "nomModule" : "",
     "Filiere_codeFil" : ""
   })
-  const [modules, setModules] = useState([])
-  const [filieres, setFilieres] = useState([])
-  const [evalAnnee, setEvalAnnee] = useState([])
-  const [mergedData, setMergedData] = useState([])
-  const [filiere, setFiliere] = useState([])
+  const [modules, setModules] = useState([]) // pour stocker les modules de la BD
+  const [moduleFil, setModuleFil] = useState([]) // pour stocker les filieres (getAllFilieres)
+  const [evalAnnee, setEvalAnnee] = useState([]) // pour stocker les enregistrement de EvalAnnee
+  const [mergedData, setMergedData] = useState([]) // pour fusionner le module avec sa filiere et son evalAnnee
+  const [filiere, setFiliere] = useState([]) // pour la liste deroulante de filieres
+  const [newEvalAnnee, setNewEvalAnnee] = useState({
+    "annee": null,
+    "optimise": null,
+    "dureeGlobale": null,
+    "dureePresence": null,
+    "dureeFAD": null,
+    "typeEval": null,
+    "modeEval": null,
+    "dateDebutPropositions": null,
+    "dateFinPropositions": null,
+    "nbrMinimPropositions": null,
+    "observation": null,
+    "Module_codeModule": null
+}) // pour creer un enregistrement evalannee pour un module
+  const [searchValue, setSearchValue] = useState('') // pour stocker la valeur de recherche 
+  const [filteredModules, setFilteredModules] = useState([]) // pour stocker le resultat de recherche
 
+  // pour la liste deroulante de filieres
   useEffect(() => {
     const token = JSON.parse(localStorage.getItem('token')).token
     const config = {
@@ -145,6 +161,7 @@ function ListerModule() {
     axios.get("http://localhost:7000/filiere", config)
     .then(res => {
       const data = res.data;
+      setModuleFil(data)
       const filiereArray = []
       for(let i = 0; i < data.length ; i++){
         filiereArray[i] = {
@@ -156,56 +173,92 @@ function ListerModule() {
     })
   }, [])
 
-  // form modal: 
+  // pour le modal de creation de module : 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  // pour le modal de description d'un module :
+  const [open2, setOpen2] = React.useState(false);
+  const handleOpen2 = () => setOpen2(true);
+  const handleClose2 = () => setOpen2(false);
 
+  // pour récuperer les modules :
+  const getModules = async () => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    await axios
+    .get("http://localhost:7000/module", config)
+    .then((res) => {
+      setModules(res.data)
+    })
+    .catch((err) => {
+      console.log(err.response.data.message)
+    })
+  }
   
+  // pour recuperer les enregistrements de EvalAnnee :
+  const getEvalAnnee = async () => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    await axios
+    .get("http://localhost:7000/evalAnnee", config)
+    .then(res => {
+      setEvalAnnee(res.data)
+    })
+    .catch(err => console.log(err.response.data.message))
+  }
+
+
+  useEffect(()=>{
+    getModules()
+    getEvalAnnee()
+  }, [])
   
-  // useEffect(()=>{
-  //   const token = JSON.parse(localStorage.getItem('token')).token
-  //   const config = {
-  //     headers : {
-  //       Authorization: `Bearer ${token}`
-  //     }
-  //   }
-
-  //   // recuperation des filieres :
-  //   axios.get("http://localhost:7000/filiere", config)
-  //   .then((res)=>{
-  //     setFilieres(res.data);
-  //   })
-  //   .catch(err => {
-  //     console.log(err.response.data.message)
-  //   })
-
-  //   // recuperation des modules :
-  //   axios.get("http://localhost:7000/module", config)
-  //   .then((res)=>{
-  //     setModules(res.data)
-  //   })
-  //   .catch((err) => {
-  //     console.log(err.response)
-  //   }) 
-
-  //   // recuperation de evalAnnee de toutes les modules (getAll) :
-  //   axios.get("http://localhost:7000/evalAnnee", config)
-  //   .then((res) => {
-  //     setEvalAnnee(res.data)
-  //   })
-  //   .catch((err) => {
-  //     console.log(err.response.data.message)
-  //   })
-
-  // }, [modules])
+  useEffect(() => {
+    const fusionData = () => {
+      let merged = [];
+      // Boucler sur les modules
+      for (let i = 0; i < modules.length; i++) {
+          let codeM = modules[i].codeModule;
+          let codeFiliere = modules[i].Filiere_codeFil;
+          let filiereTrouve = moduleFil.find((fil) => fil.codeFil === codeFiliere);
+          let evalAnneMod = evalAnnee.find((evalA) => evalA.Module_codeModule === codeM);
+  
+          // Vérifier si filiereTrouve et evalAnneMod sont définis
+          if (filiereTrouve && evalAnneMod) {
+              merged.push({
+                  codeModule: modules[i].codeModule,
+                  nomModule: modules[i].nomModule,
+                  filiere: filiereTrouve.nomFil,
+                  annee: evalAnneMod.annee,
+                  optimise: evalAnneMod.optimise,
+                  dureeG: evalAnneMod.dureeGlobale,
+                  dureeP: evalAnneMod.dureePresence,
+                  dureeFad: evalAnneMod.dureeFAD,
+                  typeEval: evalAnneMod.typeEval,
+                  modEval: evalAnneMod.modeEval,
+              });
+          }
+      }
+      setMergedData(merged);
+  };
+  fusionData()
+  }, [evalAnnee, moduleFil, modules])
 
   function createData(Code, Filière ,Nom, Année, Optimisé, DuréeGlobale, DuréePrésence, DuréeFAD, TypeEval, ModEval) {
     return {Code, Nom, Filière, Année, Optimisé, DuréeGlobale, DuréePrésence, DuréeFAD, TypeEval, ModEval};
   }
 
-  const rows = modules.map((module) => (
+  const rows = filteredModules.map((module) => (
     createData(
       module.codeModule,
       module.nomModule,
@@ -220,9 +273,12 @@ function ListerModule() {
     )
   ))
   
+  useEffect(() => {
+    setNewEvalAnnee(prevState => ({ ...prevState, Module_codeModule: newModule.codeModule }));
+  }, [newModule]); // Dépendance : newModule
 
 
-  // handleAjouter : 
+  // handleAjouter (pour créer un module et en meme temps creer son evalAnnee): 
   const handleAjouter = async () => {
     const token = JSON.parse(localStorage.getItem('token')).token
     const config = {
@@ -238,12 +294,72 @@ function ListerModule() {
         "nomModule" : "",
         "Filiere_codeFil" : ""
       })
+      const token2 = JSON.parse(localStorage.getItem('token')).token
+      const config2 = {
+        headers : {
+          Authorization: `Bearer ${token2}`
+        }
+      }
+      axios
+      .post("http://localhost:7000/evalAnnee", newEvalAnnee, config2)
+      .then(response => {
+        console.log(response.data.message)
+        getModules()
+        getEvalAnnee()
+      })
+      .catch(err => alert(err.response.data.message))
       handleClose()
     })
     .catch(err => {
-      console.log(err.response.data.message)
+      alert(err.response.data.message)
       handleOpen()
     })
+  }
+
+  // pour filtrer les modules en fonction de la valeur recherchée :
+  useEffect(() => {
+    const filtered = mergedData.filter((module) =>
+      module.nomModule.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredModules(filtered);
+    
+  }, [searchValue, mergedData]);
+
+  // pour stocker la valeur recherchée dans searchValue state :
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+
+  // pour supprimer un module avec son code :
+  const handleDelete = async (codeM) => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    await axios
+    .delete("http://localhost:7000/module/" + codeM, config)
+    .then(res => console.log(res.data.message))
+    .catch(err => console.log(err.response.data.message))
+    getModules()
+  }
+
+
+  // pour supprimer toutes les modules :
+  const handleDeleteAll = async () => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+    }
+    await axios
+    .delete('http://localhost:7000/module', config)
+    .then((res) => console.log(res.data.message))
+    .catch(err => err.response.data.message)
+    getModules()
   }
 
   return (
@@ -252,7 +368,7 @@ function ListerModule() {
           <div style={{width : "100%", display : "flex", justifyContent : "space-between", alignItems : "center"}}>
             <div>
               <FormControl variant="standard">
-                <BootstrapInput placeholder="Recherche..."/>
+                <BootstrapInput placeholder="Recherche..." onChange={handleSearch}/>
               </FormControl>
             </div>
             <div style={{display : "flex", margin : '0 10px', gap : 6}}>
@@ -273,6 +389,7 @@ function ListerModule() {
                 Ajouter
               </Button>
               <Button 
+                onClick={handleDeleteAll}
                 variant="outlined"
                 sx={{
                   height : "33px",
@@ -314,27 +431,26 @@ function ListerModule() {
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell align="center" component="th" scope="row">
-                    {row.CIN}
+                    {row.Code}
                   </TableCell>
                   <TableCell align="center">{row.Nom}</TableCell>
-                  <TableCell align="center">{row.Prénom}</TableCell>
-                  <TableCell align="center">{row.Fonction}</TableCell>
-                  <TableCell align="center">{row.Statut}</TableCell>
-                  <TableCell align="center">{row.Matricule}</TableCell>
-                  <TableCell align="center">{row.Secteur}</TableCell>
-                  <TableCell align="center">{row.Secteur}</TableCell>
-                  <TableCell align="center">{row.Secteur}</TableCell>
-                  <TableCell align="center">{row.Secteur}</TableCell>
+                  <TableCell align="center">{row.Filière}</TableCell>
+                  <TableCell align="center">{row.Année}</TableCell>
+                  <TableCell align="center">{row.Optimisé === 'TRUE' ? "Oui" : row.Optimisé === 'VRAI' ? "Non" : ""}</TableCell>
+                  <TableCell align="center">{row.DuréeGlobale}</TableCell>
+                  <TableCell align="center">{row.DuréePrésence}</TableCell>
+                  <TableCell align="center">{row.DuréeFAD}</TableCell>
+                  <TableCell align="center">{row.TypeEval}</TableCell>
+                  <TableCell align="center">{row.ModEval}</TableCell>
                   <TableCell align="center" style={{display : "flex", flexDirection : "column", alignItems : "center"}}>
-                    <AssignmentOutlinedIcon 
-                      // onClick={()=>{
-                      //   handleAssignement(row.CIN)
-                      // }}
-                      
+                    <DescriptionOutlinedIcon 
+                      onClick={()=>{
+                        handleOpen2()
+                      }}
                       style={{
                         margin : "0 7px", 
                         cursor : "pointer"
-                      }}></AssignmentOutlinedIcon>
+                      }}></DescriptionOutlinedIcon>
                     <EditOutlinedIcon 
                       // onClick={()=>{
                       //   handleUpdate(row.CIN)
@@ -345,9 +461,9 @@ function ListerModule() {
                       }}
                     ></EditOutlinedIcon>
                     <DeleteOutlineOutlinedIcon 
-                      // onClick={()=>{
-                      //   handleDelete(row.CIN)
-                      // }}
+                      onClick={()=>{
+                        handleDelete(row.Code)
+                      }}
                       style={{
                         margin : "0 4px", 
                         cursor : "pointer"
@@ -458,8 +574,107 @@ function ListerModule() {
             </Box>
           </Fade>
         </Modal>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          open={open2}
+          onClose={handleClose2}
+          closeAfterTransition
+          slots={{ backdrop: Backdrop }}
+          slotProps={{
+            backdrop: {
+              timeout: 400,
+            },
+          }}
+        >
+          <Fade in={open2}>
+            <Box sx={style}>
+              <h2 style={{marginTop : "-10px"}}>Ajouter Module</h2>
+              <hr />
+              <br />
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
+                  <FormControl variant="standard" style={{maxWidth : "100%"}} required >
+                    <InputLabel shrink htmlFor="codeModule" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
+                      Code Module
+                    </InputLabel>
+                    <BootstrapInput value={newModule.codeModule} id="codeModule" onChange={(e) => {setNewModule({...newModule, "codeModule" : e.target.value})}}/>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
+                  <FormControl variant="standard" style={{maxWidth : "100%"}} required >
+                    <InputLabel shrink htmlFor="nomModule" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
+                      Nom Module
+                    </InputLabel>
+                    <BootstrapInput value={newModule.nomModule} id="nomModule" onChange={(e) => {setNewModule({...newModule, "nomModule" : e.target.value})}}/>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
+                  <FormControl variant="standard" style={{maxWidth : "100%"}} required>
+                    <br/>
+                    <InputLabel shrink htmlFor="filiere" focused={false} style={{fontSize : "19px"}}>
+                      Filière
+                    </InputLabel>                
+                    <StyledAutocomplete
+                      id="filiere"
+                      sx={{
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          border: '1px solid rgb(0, 128, 128)',
+                          boxShadow:  "0 0 0 0.2rem rgba(0, 128, 128, 0.25)",
+                        },
+                        width : "303px"
+                      }}
+                      disablePortal
+                      options={filiere}
+                      getOptionLabel={(option) => option.nomFil}
+                        value={newModule.Filiere_codeFil ? filiere.find(item => item.codeFil === newModule.Filiere_codeFil) : null} // Récupérer l'objet filière correspondant au code
+                      renderInput={(params) => <TextField {...params} sx={{height:'44px'}} />}
+                      fullWidth
+                      onChange={(_, filiere) => {setNewModule({...newModule, "Filiere_codeFil" : filiere ? filiere.codeFil : ""})}}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={12} sm={12} style={{marginTop : "25px", borderTop : "1px solid gray", display : "flex", justifyContent : "center", gap : 20}}>
+                  <Button
+                    variant='outlined'
+                    sx={{
+                      height : "35px",
+                      color : "teal",
+                      borderColor : "teal",
+                      marginTop : "5px",
+                      ":hover" : {
+                        "backgroundColor" : "teal",
+                        "color" : "white",
+                        "borderColor" : "white"
+                      }
+                    }}
+                    // onClick = {handleAjouter}
+                  >
+                    Enregistrer
+                  </Button>
+                  <Button
+                    variant='outlined'
+                    sx={{
+                      height : "35px",
+                      color : "red",
+                      borderColor : "red",
+                      marginTop : "5px",
+                      ":hover" : {
+                        "backgroundColor" : "red",
+                        "color" : "white",
+                        "borderColor" : "white"
+                      }
+                    }}
+                    onClick = {handleClose2}
+                  >
+                    Annuler
+                  </Button>            
+                </Grid>
+              </Grid>
+            </Box>
+          </Fade>
+        </Modal>
     </>
   )
 }
-
 export default ListerModule
