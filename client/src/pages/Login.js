@@ -25,12 +25,12 @@ function Login() {
   });
   const navigate = useNavigate()
 
-  useEffect(()=>{
-    const isLogged = JSON.parse(localStorage.getItem('isLogged'))
-    if(isLogged) {
-      navigate('/directeur/statistique')
-    }
-  })
+  // useEffect(()=>{
+  //   const isLogged = JSON.parse(localStorage.getItem('isLogged'))
+  //   if(isLogged) {
+  //     navigate('/directeur/statistique')
+  //   }
+  // })
 
   const handleLogIn = (e) => {
     e.preventDefault();

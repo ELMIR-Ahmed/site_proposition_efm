@@ -5,6 +5,10 @@ const { Groupe } = require("../models")
 
 const createFiliere = async (req, res) => {
   try {
+    const newFiliere = req.body
+    if (!newFiliere.codeFil || !newFiliere.nomFil || !newFiliere.anneeFil) {
+      return res.status(400).json({ message : "Veuillez remplir les champs !" })
+    }
     await Filiere.create(req.body)
     res.status(200).json({ message : "Filière créée avec succès !" })
   } catch (error) {

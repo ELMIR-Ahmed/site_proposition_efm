@@ -195,23 +195,22 @@ function ListerFiliere() {
         Authorization: `Bearer ${token}`
       }
     }
-    if (!newFiliere.codeFil && !newFiliere.nomFil && !newFiliere.anneeFil) {
-      alert("touts les champs sont obligatoires !")
-    }
+
     await axios.post("http://localhost:7000/filiere", newFiliere, config)
     .then(res => {
       console.log(res.data.message);
       setNewFiliere({
-        "codeFil" : "",
-        "nomFil" : "",
-        "anneeFil" : ""
-      })
+        "codeFil": "",
+        "nomFil": "",
+        "anneeFil": ""
+      });
       handleClose()
       getFilieres()
     })
     .catch(err => {
-      console.log(err.response.data.message)
+      alert(err.response.data.message)
     })
+    console.log(newFiliere)
   }
 
   return (
