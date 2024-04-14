@@ -10,5 +10,6 @@ router.get('/', ModuleController.getModules)
 router.post('/', ModuleController.createModule)
 router.delete('/:codeModule', ModuleController.deleteModule)
 router.delete('/', ModuleController.deleteModules)
+router.put('/', ModuleController.updateModule)
 
 module.exports = router

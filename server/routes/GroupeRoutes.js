@@ -3,18 +3,21 @@ const router = express.Router();
 const groupeController = require('../controllers/GroupeController');
 
 // Route pour créer un nouveau groupe
-router.post('/groupes', groupeController.createGroupe);
+router.post('/', groupeController.createGroupe);
 
 // Route pour récupérer tous les groupes
-router.get('/groupes', groupeController.getAllGroupes);
+router.get('/', groupeController.getAllGroupes);
 
 // Route pour récupérer un groupe par son ID
-router.get('/groupes/:id', groupeController.getGroupeById);
+router.get('/:id', groupeController.getGroupeById);
 
 // Route pour mettre à jour un groupe
-router.put('/groupes/:id', groupeController.updateGroupe);
+router.put('/:id', groupeController.updateGroupe);
 
 // Route pour supprimer un groupe
-router.delete('/groupes/:id', groupeController.deleteGroupe);
+router.delete('/:id', groupeController.deleteGroupe);
+
+// Route pour supprimer un groupe
+router.delete('/', groupeController.deleteGroupes);
 
 module.exports = router;

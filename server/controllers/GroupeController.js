@@ -6,13 +6,13 @@ const groupeController = {
         try {
             const { nomGrp, Filiere_codeFil } = req.body;
             const nouveauGroupe = await Groupe.create({
-                nomGrp,
-                Filiere_codeFil
+                "nomGrp" : nomGrp,
+                "Filiere_codeFil" : Filiere_codeFil
             });
-            res.status(201).json({ message: 'Groupe créé avec succès', groupe: nouveauGroupe });
+            res.status(201).json({ message: 'Groupe créé avec succès'});
         } catch (error) {
             console.error('Erreur lors de la création du groupe :', error);
-            res.status(500).json({ error: 'Erreur lors de la création du groupe' });
+            res.status(500).json({ message: 'Erreur lors de la création du groupe' + error });
         }
     },
 
@@ -46,18 +46,18 @@ const groupeController = {
     // Méthode pour mettre à jour un groupe
     async updateGroupe(req, res) {
         try {
-            const { id } = req.params;
+            const { idGrp } = req.body;
             const { nomGrp, Filiere_codeFil } = req.body;
-            const groupe = await Groupe.findByPk(id);
+            const groupe = await Groupe.findByPk(idGrp);
             if (!groupe) {
-                res.status(404).json({ error: 'Groupe non trouvé' });
+                res.status(404).json({ message : 'Groupe non trouvé' });
             } else {
-                await groupe.update({ nomGrp, Filiere_codeFil });
-                res.status(200).json({ message: 'Groupe mis à jour avec succès', groupe });
+                await groupe.update({ "nomGrp" : nomGrp, Filiere_codeFil : Filiere_codeFil });
+                res.status(200).json({ message : 'Groupe mis à jour avec succès'});
             }
         } catch (error) {
             console.error('Erreur lors de la mise à jour du groupe :', error);
-            res.status(500).json({ error: 'Erreur lors de la mise à jour du groupe' });
+            res.status(500).json({ message : 'Erreur lors de la mise à jour du groupe' });
         }
     },
 
@@ -67,14 +67,23 @@ const groupeController = {
             const { id } = req.params;
             const groupe = await Groupe.findByPk(id);
             if (!groupe) {
-                res.status(404).json({ error: 'Groupe non trouvé' });
+                res.status(404).json({ message : 'Groupe non trouvé' });
             } else {
                 await groupe.destroy();
                 res.status(200).json({ message: 'Groupe supprimé avec succès' });
             }
         } catch (error) {
             console.error('Erreur lors de la suppression du groupe :', error);
-            res.status(500).json({ error: 'Erreur lors de la suppression du groupe' });
+            res.status(500).json({ message : 'Erreur lors de la suppression du groupe' });
+        }
+    },
+
+    async deleteGroupes(req, res) {
+        try {
+            await Groupe.destroy({where : {}});
+            res.status(200).json({ message : "Groupes supprimés avec succès !" })
+        } catch (error) {
+            res.status(500).json({ message: 'Erreur lors de la suppression du groupe' });
         }
     }
 };

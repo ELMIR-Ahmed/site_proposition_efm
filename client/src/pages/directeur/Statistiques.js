@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Layout from '../../components/Layout'
 import { Box } from '@mui/material'
 import Table from '@mui/material/Table';
@@ -8,6 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { useNavigate } from 'react-router-dom'
 
 function createData(CIN, Nom, Prénom, Fonction, Matricule, Secteur, Action) {
   return { CIN, Nom, Prénom, Fonction, Matricule, Secteur, Action };
@@ -29,6 +30,15 @@ const rows = [
 
 
 function Statistiques() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const isLogged = JSON.parse(localStorage.getItem('token')).token
+    if(!isLogged) {
+      navigate('/')
+    }
+  })
+
   return (
     <div style={{padding : "30px"}}>
       <Layout>

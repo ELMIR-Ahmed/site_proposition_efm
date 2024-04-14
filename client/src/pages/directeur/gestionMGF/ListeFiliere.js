@@ -96,12 +96,30 @@ function ListerFiliere() {
     "nomFil" : "",
     "anneeFil" : ""
   })
+  const [modifiedFiliere, setModifiedFiliere] = useState({
+    "codeFil" : "",
+    "nomFil" : "",
+    "anneeFil" : ""
+  })
 
 
   // form modal: 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [open2, setOpen2] = React.useState(false);
+  const handleOpen2 = (codeFil) => {
+    setOpen2(true);
+    const currFil = filieres.find(fil => fil.codeFil === codeFil)
+    setModifiedFiliere({
+      'codeFil' : currFil.codeFil,
+      'nomFil' : currFil.nomFil,
+      'anneeFil' : currFil.anneeFil
+    })
+
+  };
+  const handleClose2 = () => setOpen2(false);
   
   const getFilieres = () => {
     const token = JSON.parse(localStorage.getItem('token')).token
@@ -213,6 +231,27 @@ function ListerFiliere() {
     console.log(newFiliere)
   }
 
+  const handleUpdate = async () => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+    }
+    const codeFil = modifiedFiliere.codeFil;
+    await axios
+    .put('http://localhost:7000/filiere/' + codeFil, modifiedFiliere, config)
+    .then(res => console.log(res.data.message))
+    .catch(err => console.log(err.response.data.message))
+    setModifiedFiliere({
+      'codeFil' : "",
+      'nomFil' : "",
+      'anneeFil' : ""
+    })
+    handleClose2()
+    getFilieres()
+  } 
+
   return (
     <>
       <div style={{width : "100%", height : "50px",marginBottom : "10px", boxShadow: "0.5px 2px 4px 1px rgb(203, 203, 203)" ,display : "flex", justifyContent : "start", alignItems : "center", borderRadius : "3px"}}>
@@ -284,9 +323,9 @@ function ListerFiliere() {
                 <TableCell align="center">{row.anneeFil}</TableCell>
                 <TableCell align="center" style={{display : "flex", alignItems : "center", justifyContent : "center"}}>
                   <EditOutlinedIcon 
-                    // onClick={()=>{
-                    //   handleUpdate(row.CIN)
-                    // }}
+                    onClick={() => {
+                      handleOpen2(row.codeFil)}
+                    }
                     style={{
                       margin : "0 4px", 
                       cursor : "pointer"
@@ -381,6 +420,89 @@ function ListerFiliere() {
                     }
                   }}
                   onClick = {handleClose}
+                >
+                  Annuler
+                </Button>            
+              </Grid>
+            </Grid>
+          </Box>
+        </Fade>
+      </Modal>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={open2}
+        onClose={handleClose2}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 400,
+          },
+        }}
+      >
+        <Fade in={open2}>
+          <Box sx={style}>
+            <h2 style={{marginTop : "-10px"}}>Modifier Filière</h2>
+            <hr />
+            <br />
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
+                <FormControl variant="standard" style={{maxWidth : "100%"}} required >
+                  <InputLabel shrink htmlFor="codeFil" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
+                    Code Filière
+                  </InputLabel>
+                  <BootstrapInput value={modifiedFiliere.codeFil} readOnly id="codeFil" onChange={(e) => {setModifiedFiliere({...modifiedFiliere, "codeFil" : e.target.value})}}/>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
+                <FormControl variant="standard" style={{maxWidth : "100%"}} required >
+                  <InputLabel shrink htmlFor="nomFil" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
+                    Nom Filière
+                  </InputLabel>
+                  <BootstrapInput value={modifiedFiliere.nomFil} id="nomFil" onChange={(e) => {setModifiedFiliere({...modifiedFiliere, "nomFil" : e.target.value})}}/>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
+                <FormControl variant="standard" style={{maxWidth : "100%"}} required >
+                  <InputLabel shrink htmlFor="anneeFil" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
+                    Année Filière
+                  </InputLabel>
+                  <BootstrapInput value={modifiedFiliere.anneeFil} id="anneeFil" onChange={(e) => {setModifiedFiliere({...modifiedFiliere, "anneeFil" : e.target.value})}}/>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={12} sm={12} style={{marginTop : "25px", borderTop : "1px solid gray", display : "flex", justifyContent : "center", gap : 20}}>
+                <Button
+                  variant='outlined'
+                  sx={{
+                    height : "35px",
+                    color : "teal",
+                    borderColor : "teal",
+                    marginTop : "5px",
+                    ":hover" : {
+                      "backgroundColor" : "teal",
+                      "color" : "white",
+                      "borderColor" : "white"
+                    }
+                  }}
+                  onClick = {handleUpdate}
+                >
+                  Modifier
+                </Button>
+                <Button
+                  variant='outlined'
+                  sx={{
+                    height : "35px",
+                    color : "red",
+                    borderColor : "red",
+                    marginTop : "5px",
+                    ":hover" : {
+                      "backgroundColor" : "red",
+                      "color" : "white",
+                      "borderColor" : "white"
+                    }
+                  }}
+                  onClick = {handleClose2}
                 >
                   Annuler
                 </Button>            

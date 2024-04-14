@@ -22,6 +22,7 @@ import InputLabel from '@mui/material/InputLabel'
 import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import { useNavigate } from 'react-router-dom'
 
 
 const style = {
@@ -123,13 +124,14 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
 
 
 function ListerModule() {
+  const navigate = useNavigate()
   const [newModule, setNewModule] = useState({
     "codeModule" : "",
     "nomModule" : "",
     "Filiere_codeFil" : ""
   })
-  const [modules, setModules] = useState([]) // pour stocker les modules de la BD
   const [moduleFil, setModuleFil] = useState([]) // pour stocker les filieres (getAllFilieres)
+  const [modules, setModules] = useState([]) // pour stocker les modules de la BD
   const [evalAnnee, setEvalAnnee] = useState([]) // pour stocker les enregistrement de EvalAnnee
   const [mergedData, setMergedData] = useState([]) // pour fusionner le module avec sa filiere et son evalAnnee
   const [filiere, setFiliere] = useState([]) // pour la liste deroulante de filieres
@@ -178,11 +180,6 @@ function ListerModule() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // pour le modal de description d'un module :
-  const [open2, setOpen2] = React.useState(false);
-  const handleOpen2 = () => setOpen2(true);
-  const handleClose2 = () => setOpen2(false);
-
   // pour récuperer les modules :
   const getModules = async () => {
     const token = JSON.parse(localStorage.getItem('token')).token
@@ -216,7 +213,7 @@ function ListerModule() {
     })
     .catch(err => console.log(err.response.data.message))
   }
-
+  
 
   useEffect(()=>{
     getModules()
@@ -254,10 +251,11 @@ function ListerModule() {
   fusionData()
   }, [evalAnnee, moduleFil, modules])
 
-  function createData(Code, Filière ,Nom, Année, Optimisé, DuréeGlobale, DuréePrésence, DuréeFAD, TypeEval, ModEval) {
+  function createData(Code, Nom ,Filière, Année, Optimisé, DuréeGlobale, DuréePrésence, DuréeFAD, TypeEval, ModEval) {
     return {Code, Nom, Filière, Année, Optimisé, DuréeGlobale, DuréePrésence, DuréeFAD, TypeEval, ModEval};
   }
 
+  console.log(mergedData)
   const rows = filteredModules.map((module) => (
     createData(
       module.codeModule,
@@ -362,6 +360,7 @@ function ListerModule() {
     getModules()
   }
 
+
   return (
     <>
         <div style={{width : "100%", height : "50px",marginBottom : "10px", boxShadow: "0.5px 2px 4px 1px rgb(203, 203, 203)" ,display : "flex", justifyContent : "start", alignItems : "center", borderRadius : "3px"}}>
@@ -435,26 +434,26 @@ function ListerModule() {
                   </TableCell>
                   <TableCell align="center">{row.Nom}</TableCell>
                   <TableCell align="center">{row.Filière}</TableCell>
-                  <TableCell align="center">{row.Année}</TableCell>
-                  <TableCell align="center">{row.Optimisé === 'TRUE' ? "Oui" : row.Optimisé === 'VRAI' ? "Non" : ""}</TableCell>
-                  <TableCell align="center">{row.DuréeGlobale}</TableCell>
-                  <TableCell align="center">{row.DuréePrésence}</TableCell>
-                  <TableCell align="center">{row.DuréeFAD}</TableCell>
-                  <TableCell align="center">{row.TypeEval}</TableCell>
-                  <TableCell align="center">{row.ModEval}</TableCell>
+                  <TableCell align="center">{row.Année || "-------"}</TableCell>
+                  <TableCell align="center">{row.Optimisé === 'TRUE' ? "Oui" : row.Optimisé === 'FALSE' ? "Non" : "" || "-------"}</TableCell>
+                  <TableCell align="center">{row.DuréeGlobale  || "-------"}</TableCell>
+                  <TableCell align="center">{row.DuréePrésence || "-------"}</TableCell>
+                  <TableCell align="center">{row.DuréeFAD || "-------"}</TableCell>
+                  <TableCell align="center">{row.TypeEval || "-------"}</TableCell>
+                  <TableCell align="center">{row.ModEval || "-------"}</TableCell>
                   <TableCell align="center" style={{display : "flex", flexDirection : "column", alignItems : "center"}}>
                     <DescriptionOutlinedIcon 
                       onClick={()=>{
-                        handleOpen2()
+                        navigate('/directeur/gestionModFilGrp/Module/Description/'+row.Code)
                       }}
                       style={{
                         margin : "0 7px", 
                         cursor : "pointer"
                       }}></DescriptionOutlinedIcon>
                     <EditOutlinedIcon 
-                      // onClick={()=>{
-                      //   handleUpdate(row.CIN)
-                      // }}
+                      onClick={()=>{
+                        navigate('/directeur/gestionModFilGrp/Module/Update/' + row.Code)
+                      }}
                       style={{
                         margin : "0 4px", 
                         cursor : "pointer"
@@ -566,106 +565,6 @@ function ListerModule() {
                       }
                     }}
                     onClick = {handleClose}
-                  >
-                    Annuler
-                  </Button>            
-                </Grid>
-              </Grid>
-            </Box>
-          </Fade>
-        </Modal>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={open2}
-          onClose={handleClose2}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 400,
-            },
-          }}
-        >
-          <Fade in={open2}>
-            <Box sx={style}>
-              <h2 style={{marginTop : "-10px"}}>Ajouter Module</h2>
-              <hr />
-              <br />
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
-                  <FormControl variant="standard" style={{maxWidth : "100%"}} required >
-                    <InputLabel shrink htmlFor="codeModule" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
-                      Code Module
-                    </InputLabel>
-                    <BootstrapInput value={newModule.codeModule} id="codeModule" onChange={(e) => {setNewModule({...newModule, "codeModule" : e.target.value})}}/>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
-                  <FormControl variant="standard" style={{maxWidth : "100%"}} required >
-                    <InputLabel shrink htmlFor="nomModule" focused={false} style={{fontSize : "19px", marginLeft : "10px"}}>
-                      Nom Module
-                    </InputLabel>
-                    <BootstrapInput value={newModule.nomModule} id="nomModule" onChange={(e) => {setNewModule({...newModule, "nomModule" : e.target.value})}}/>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={12} sm={12} style={{display : "flex", justifyContent : "center"}}>
-                  <FormControl variant="standard" style={{maxWidth : "100%"}} required>
-                    <br/>
-                    <InputLabel shrink htmlFor="filiere" focused={false} style={{fontSize : "19px"}}>
-                      Filière
-                    </InputLabel>                
-                    <StyledAutocomplete
-                      id="filiere"
-                      sx={{
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          border: '1px solid rgb(0, 128, 128)',
-                          boxShadow:  "0 0 0 0.2rem rgba(0, 128, 128, 0.25)",
-                        },
-                        width : "303px"
-                      }}
-                      disablePortal
-                      options={filiere}
-                      getOptionLabel={(option) => option.nomFil}
-                        value={newModule.Filiere_codeFil ? filiere.find(item => item.codeFil === newModule.Filiere_codeFil) : null} // Récupérer l'objet filière correspondant au code
-                      renderInput={(params) => <TextField {...params} sx={{height:'44px'}} />}
-                      fullWidth
-                      onChange={(_, filiere) => {setNewModule({...newModule, "Filiere_codeFil" : filiere ? filiere.codeFil : ""})}}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={12} sm={12} style={{marginTop : "25px", borderTop : "1px solid gray", display : "flex", justifyContent : "center", gap : 20}}>
-                  <Button
-                    variant='outlined'
-                    sx={{
-                      height : "35px",
-                      color : "teal",
-                      borderColor : "teal",
-                      marginTop : "5px",
-                      ":hover" : {
-                        "backgroundColor" : "teal",
-                        "color" : "white",
-                        "borderColor" : "white"
-                      }
-                    }}
-                    // onClick = {handleAjouter}
-                  >
-                    Enregistrer
-                  </Button>
-                  <Button
-                    variant='outlined'
-                    sx={{
-                      height : "35px",
-                      color : "red",
-                      borderColor : "red",
-                      marginTop : "5px",
-                      ":hover" : {
-                        "backgroundColor" : "red",
-                        "color" : "white",
-                        "borderColor" : "white"
-                      }
-                    }}
-                    onClick = {handleClose2}
                   >
                     Annuler
                   </Button>            

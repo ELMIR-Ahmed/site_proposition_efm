@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import { FormControl, InputBase, InputLabel } from '@mui/material';
@@ -9,6 +9,8 @@ import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import Button from '@mui/material/Button';
 import axios from 'axios';
 import Papa from 'papaparse'
+import { useNavigate , useParams} from 'react-router-dom';
+
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -97,10 +99,12 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
 }));
 
 
-function AjouterFormateur() {
+function UpdateFormateur() {
+  const navigate = useNavigate()
+  const { CIN } = useParams()
   const [file, setFile] = useState(null)
   const [fileName, setFileName] = useState("")
-  const [newFormateur, setNewFormateur] = useState({
+  const [modifiedFormateur, setModifiedFormateur] = useState({
     "CIN" : "",
     "nom" : "",
     "prenom" : "",
@@ -136,7 +140,7 @@ function AjouterFormateur() {
   ];
 
 
-  const handleAjouter = async () => {
+  const handleUpdate = async () => {
     const token = JSON.parse(localStorage.getItem('token')).token
     const config = {
       headers : {
@@ -144,7 +148,7 @@ function AjouterFormateur() {
       }
     }
     if (file) {
-      localStorage.setItem('added', JSON.stringify(true))
+      // localStorage.setItem('added', JSON.stringify(true))
       for (let i = 0; i < file.length; i++) {
         const row = {
           "CIN" : file[i].CIN,
@@ -156,7 +160,7 @@ function AjouterFormateur() {
           "secteur" : file[i].secteur,
           "motDePasse" : file[i].motDePasse
         }
-        await axios.post("http://localhost:7000/personnel", row, config)
+        await axios.put("http://localhost:7000/personnel", row, config)
         .then(res => {
           console.log(res.data.message);
         })
@@ -166,16 +170,16 @@ function AjouterFormateur() {
       }
       setFile(null);
       setFileName('')
-      localStorage.setItem('added', JSON.stringify(false))
+      // localStorage.setItem('added', JSON.stringify(false))
     } else {
-      await axios.post("http://localhost:7000/personnel", newFormateur, config)
+      await axios.put("http://localhost:7000/personnel", modifiedFormateur, config)
       .then(res => {
         console.log(res.data.message);
       })
       .catch(err => {
         console.log(err.response.data.message)
       })
-      setNewFormateur({
+      setModifiedFormateur({
         "CIN" : "",
         "nom" : "",
         "prenom" : "",
@@ -187,6 +191,7 @@ function AjouterFormateur() {
       })
     }
     // console.log(file)
+    navigate('/directeur/gestionFormateurs/Liste')
   }
 
   const handleFileChange = (event) => {
@@ -217,6 +222,42 @@ function AjouterFormateur() {
     }
   };
 
+  // const getFormateurs = async () => {
+  //   const token = JSON.parse(localStorage.getItem('token')).token
+  //   const config = {
+  //     headers : {
+  //       Authorization : `Bearer ${token}`
+  //     }
+  //   }
+  //   await axios
+  //   .get(`http://localhost:7000/personnel`, config)
+  //   .then(res => {
+  //     const currFormateur = res.data.find((forma) => forma.CIN === CIN)
+  //     setModifiedFormateur(currFormateur)
+  //   })
+  //   .catch(err => {
+  //     console.log(err.response.data.message)
+  //   })
+  // }
+
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+    }
+    axios
+    .get(`http://localhost:7000/personnel`, config)
+    .then(res => {
+      const currFormateur = res.data.find((forma) => forma.CIN === CIN)
+      setModifiedFormateur(currFormateur)
+    })
+    .catch(err => {
+      console.log(err.response.data.message)
+    })
+  }, [CIN])
+
   return (
     <div style={{marginTop : "60px"}}>
       <div style={{width : "100%", height : "100%",marginBottom : "20px", boxShadow: "0.5px 2px 4px 1px rgb(203, 203, 203)",marginTop : "-40px", display : "flex", justifyContent : "start", alignItems : "center", borderRadius : "3px", padding : "20px"}}>
@@ -226,7 +267,7 @@ function AjouterFormateur() {
               <InputLabel shrink htmlFor="cin" focused={false} style={{fontSize : "19px"}}>
                 CIN
               </InputLabel>
-              <BootstrapInput id="cin" onChange={(e) => {setNewFormateur({...newFormateur, "CIN" : e.target.value})}}/>
+              <BootstrapInput id="cin" readOnly value={modifiedFormateur.CIN || ""}/>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={4} sm={12}>
@@ -234,7 +275,7 @@ function AjouterFormateur() {
               <InputLabel shrink htmlFor="nom" focused={false} style={{fontSize : "19px"}}>
                 Nom
               </InputLabel>
-              <BootstrapInput id="nom" onChange={(e) => {setNewFormateur({...newFormateur, "nom" : e.target.value})}}/>
+              <BootstrapInput id="nom" value={modifiedFormateur.nom || ""} onChange={(e) => {setModifiedFormateur({...modifiedFormateur, "nom" : e.target.value})}}/>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={4} sm={12}>
@@ -242,7 +283,7 @@ function AjouterFormateur() {
               <InputLabel shrink htmlFor="prenom" focused={false} style={{fontSize : "19px"}}>
                 Prénom
               </InputLabel>
-              <BootstrapInput id="prenom" onChange={(e) => {setNewFormateur({...newFormateur, "prenom" : e.target.value})}}/>
+              <BootstrapInput id="prenom" value={modifiedFormateur.prenom || ""} onChange={(e) => {setModifiedFormateur({...modifiedFormateur, "prenom" : e.target.value})}}/>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={6} sm={12}>
@@ -250,7 +291,7 @@ function AjouterFormateur() {
               <InputLabel shrink htmlFor="statut" focused={false} style={{fontSize : "19px"}}>
                 Statut
               </InputLabel>
-              <BootstrapInput id="statut" onChange={(e) => {setNewFormateur({...newFormateur, "statut" : e.target.value})}}/>
+              <BootstrapInput id="statut" value={modifiedFormateur.statut || ""} onChange={(e) => {setModifiedFormateur({...modifiedFormateur, "statut" : e.target.value})}}/>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={6} sm={12}>
@@ -258,7 +299,7 @@ function AjouterFormateur() {
               <InputLabel shrink htmlFor="fonction" focused={false} style={{fontSize : "19px"}}>
                 Fonction
               </InputLabel>
-              <BootstrapInput id="fonction" onChange={(e) => {setNewFormateur({...newFormateur, "fonction" : e.target.value})}}/>
+              <BootstrapInput id="fonction" value={modifiedFormateur.fonction || ""} onChange={(e) => {setModifiedFormateur({...modifiedFormateur, "fonction" : e.target.value})}}/>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={6} sm={12}>
@@ -277,10 +318,10 @@ function AjouterFormateur() {
                 }}
                 disablePortal
                 options={Secteurs}
-                value={newFormateur.secteur ? newFormateur.secteur : ""}
+                value={modifiedFormateur.secteur ? modifiedFormateur.secteur : ""}
                 renderInput={(params) => <TextField {...params} sx={{height:'44px'}} />}
                 fullWidth
-                onChange={(e, secteur) => {setNewFormateur({...newFormateur, "secteur" : secteur})}}
+                onChange={(_, secteur) => {setModifiedFormateur({...modifiedFormateur, "secteur" : secteur})}}
               />
             </FormControl>
           </Grid>
@@ -289,15 +330,15 @@ function AjouterFormateur() {
               <InputLabel shrink htmlFor="bootstrap-input" focused={false} style={{fontSize : "19px"}}>
                 Matricule
               </InputLabel>
-              <BootstrapInput id="bootstrap-input" onChange={(e) => {setNewFormateur({...newFormateur, "matricule" : e.target.value})}}/>
+              <BootstrapInput id="bootstrap-input" value={modifiedFormateur.matricule || ""} onChange={(e) => {setModifiedFormateur({...modifiedFormateur, "matricule" : e.target.value})}}/>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={6} sm={12} >
-            <FormControl variant="standard" style={{maxWidth : "100%"}} required fullWidth>
+            <FormControl variant="standard" style={{maxWidth : "100%"}} fullWidth>
               <InputLabel shrink htmlFor="password" focused={false} style={{fontSize : "19px"}}>
-                Mot De Passe
+                Nouveau Mot De Passe ?
               </InputLabel>
-              <BootstrapInput type='password' id="password" onChange={(e) => {setNewFormateur({...newFormateur, "motDePasse" : e.target.value})}}/>
+              <BootstrapInput type='password'  id="password" onChange={(e) => {setModifiedFormateur({...modifiedFormateur, "motDePasse" : e.target.value})}}/>
             </FormControl>
           </Grid>
         </Grid>
@@ -372,7 +413,7 @@ function AjouterFormateur() {
             }}
           >
             <Button 
-              onClick={handleAjouter}
+              onClick={handleUpdate}
               variant="contained" 
               size='large'
               sx={{
@@ -382,7 +423,7 @@ function AjouterFormateur() {
                 }
               }}
             >
-              Ajouter
+              Modifier
             </Button>
           </div>
         </div>
@@ -390,4 +431,4 @@ function AjouterFormateur() {
   )
 }
 
-export default AjouterFormateur
+export default UpdateFormateur

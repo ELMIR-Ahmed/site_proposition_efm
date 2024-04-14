@@ -10,11 +10,66 @@ import axios from 'axios'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import LinearProgress from '@mui/material/LinearProgress';
+import { useNavigate } from 'react-router-dom'
+import { Button, FormControl } from '@mui/material';
+import { styled } from '@mui/material';
+import { InputBase } from '@mui/material'
+
+
+const BootstrapInput = styled(InputBase)(({ theme }) => ({
+  'label + &': {
+    marginTop: theme.spacing(3),
+  },
+  '& .MuiInputBase-input': {
+    borderRadius: 4,
+    margin : "0 10px",
+    position: 'relative',
+    backgroundColor: theme.palette.mode === 'light' ? '#F3F6F9' : '#1A2027',
+    border: '1px solid',
+    borderColor: theme.palette.mode === 'light' ? '#E0E3E7' : '#2D3843',
+    fontSize: 16,
+    width: '280px',
+    height : "10px",
+    padding: '10px 12px',
+    transition: theme.transitions.create([
+      'border-color',
+      'background-color',
+      'box-shadow',
+    ]),
+    // Use the system font instead of the default Roboto font.
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+    '&:focus': {
+      boxShadow:  "0 0 0 0.2rem rgba(0, 128, 128, 0.25)", /* Modifier la couleur du box-shadow en focus à 'teal' avec une opacité de 0.25 */
+      borderColor: 'teal',
+    },
+    '& .MuiInputLabel-root': {
+    color: theme.palette.mode === 'light' ? '#000' : '#ffff', // Couleur du label
+    '&.Mui-focused': {
+      color: theme.palette.mode === 'light' ? '#000' : '#ffff', // Conserver la même couleur que le label par défaut en focus
+    },
+    },
+    '&::placeholder': {  // Add placeholder styles here
+      color: 'gray', // Adjust the color and other styles as needed
+    },
+    
+  },
+}));
 
 
 function ListerFromateurs() {
   const [formateurs, setFormateurs] = useState([])
+  const navigate = useNavigate()
 
   useEffect(()=>{
     const token = JSON.parse(localStorage.getItem('token')).token
@@ -69,7 +124,54 @@ function ListerFromateurs() {
 
   return (
     <>
-      
+      <div style={{width : "100%", height : "50px",marginBottom : "10px", boxShadow: "0.5px 2px 4px 1px rgb(203, 203, 203)" ,display : "flex", justifyContent : "start", alignItems : "center", borderRadius : "3px"}}>
+        <div style={{width : "100%", display : "flex", justifyContent : "space-between", alignItems : "center"}}>
+          <div>
+            <FormControl variant="standard" >
+              <BootstrapInput
+                id="search"
+                placeholder="Recherche..." 
+                // onChange = {handleSearch}
+                // value={searchValue}
+              />
+            </FormControl>
+          </div>
+          <div style={{display : "flex", margin : '0 10px', gap : 6}}>
+            <Button 
+              // onClick={handleOpen}
+              variant="outlined"
+              sx={{
+                height : "33px",
+                color : "teal",
+                borderColor : "teal",
+                ":hover" : {
+                  "backgroundColor" : "teal",
+                  "color" : "white",
+                  "borderColor" : "white"
+                }
+              }}
+            >
+              Ajouter
+            </Button>
+            <Button 
+              // onClick = {handleDeleteAll}
+              variant="outlined"
+              sx={{
+                height : "33px",
+                color : "red",
+                borderColor : "red",
+                ":hover" : {
+                  "backgroundColor" : "red",
+                  "color" : "white",
+                  "borderColor" : "white"
+                }
+              }}
+            >
+              Tout Supprimer
+            </Button>
+          </div>
+        </div>
+      </div>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -109,9 +211,9 @@ function ListerFromateurs() {
                         cursor : "pointer"
                       }}></AssignmentOutlinedIcon>
                     <EditOutlinedIcon 
-                      // onClick={()=>{
-                      //   handleUpdate(row.CIN)
-                      // }}
+                      onClick={()=>{
+                        navigate("/directeur/gestionFormateurs/Liste/" + row.CIN)
+                      }}
                       style={{
                         margin : "0 4px", 
                         cursor : "pointer"

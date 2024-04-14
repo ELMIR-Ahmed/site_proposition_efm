@@ -93,7 +93,7 @@ function GestionModFilGrp(props) {
                 <Button 
                   onClick={() => {
                     handleActiveGrp();
-                    // navigate("/directeur/gestionModFilGrp/Groupe")
+                    navigate("/directeur/gestionModFilGrp/Groupe")
                   }}                  
                   sx={{
                     ":hover" : {

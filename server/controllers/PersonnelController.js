@@ -44,20 +44,17 @@ const getPersonnelByCIN = async (req, res) => {
 // Middleware pour mettre à jour un personnel
 const updatePersonnel = async (req, res) => {
     try {
-        const [updated] = await Personnel.update(req.body, {
-            where: { CIN: req.params.CIN }
-        });
-        if (updated) {
-            // const updatedPersonnel = await Personnel.findByPk(req.params.CIN);
-            return res.json({ message: 'Personnel modifié avec succes.' });
+        const {CIN} = req.body
+        const hashedPass = await bcrypt.hash(req.body.motDePasse, 12)
+        req.body.motDePasse = hashedPass
+        const personnel = await Personnel.findByPk(CIN)
+        if (!personnel) { 
+            return res.status(400).json({message : "Personnel non trouvé !"})
         }
-        throw new Error('Personnel non trouvé.');
+        await personnel.update(req.body)
+        res.status(200).json({message : "Personnel modifié avec succès !"})
     } catch (error) {
-        if (error) {
-            return res.json({ messsage : error.message })
-        }
-        // console.error(error);
-        res.status(500).json({ message: 'Une erreur est survenue lors de la mise à jour du personnel.' });
+        res.status(500).json({message : "Une erreur est survenue lors de la modification du personnel"})
     }
 }
 
