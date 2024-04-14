@@ -38,13 +38,13 @@ const evalAnneeController = {
 
     async updateEvalAnnee(req, res) {
         try {
-            const { id } = req.params;
-            const evalAnnee = await EvalAnnee.findByPk(id);
+            const { Module_codeModule } = req.body;
+            const evalAnnee = await EvalAnnee.findOne({where : {Module_codeModule : Module_codeModule}});
             if (!evalAnnee) {
                 res.status(404).json({ error: 'Évaluation annuelle non trouvée' });
             } else {
                 await evalAnnee.update(req.body);
-                res.status(200).json({ message: 'Évaluation annuelle mise à jour avec succès', evalAnnee });
+                res.status(200).json({ message: 'Évaluation annuelle mise à jour avec succès' });
             }
         } catch (error) {
             console.error('Erreur lors de la mise à jour de l\'évaluation annuelle :', error);

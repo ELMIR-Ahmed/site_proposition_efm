@@ -78,10 +78,25 @@ const deleteAllFilieres = async (req, res) => {
   }
 }
 
+const updateFiliere = async (req, res) =>  {
+  try {
+    const { codeFil } = req.body
+    const filiere = await Filiere.findByPk(codeFil)
+    if(!filiere) {
+      return res.status(404).json({ message : "Filière non trouvée !" })
+    }
+    filiere.update(req.body)
+    res.status(200).json({ message : "filière modifié avec succès !"})
+  } catch (error) {
+    res.status(500).json({ message : 'Une erreur est survenue lors de la modification du filiere.' })
+  }
+}
+
 module.exports = {
   createFiliere,
   getFiliere,
   getFilieres,
   deleteFiliere,
-  deleteAllFilieres
+  deleteAllFilieres,
+  updateFiliere
 }

@@ -7,5 +7,6 @@ router.get('/', FiliereController.getFilieres)
 router.post('/', FiliereController.createFiliere)
 router.delete('/:codeFil', FiliereController.deleteFiliere)
 router.delete('/', FiliereController.deleteAllFilieres)
+router.put('/:codeFil', FiliereController.updateFiliere)
 
 module.exports = router

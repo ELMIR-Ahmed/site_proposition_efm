@@ -8,6 +8,6 @@ router.get('/:CIN', personnelController.getPersonnelByCIN);
 router.get('/', personnelController.getAllPersonnel);
 router.post('/', personnelController.createPersonnel);
 router.delete('/:CIN', personnelController.deletePersonnel);
-router.put('/:CIN', personnelController.updatePersonnel);
+router.put('/', personnelController.updatePersonnel);
 
 module.exports = router; 
