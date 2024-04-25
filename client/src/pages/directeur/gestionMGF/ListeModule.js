@@ -526,7 +526,7 @@ function ListerModule() {
                       disablePortal
                       options={filiere}
                       getOptionLabel={(option) => option.nomFil}
-                        value={newModule.Filiere_codeFil ? filiere.find(item => item.codeFil === newModule.Filiere_codeFil) : null} // Récupérer l'objet filière correspondant au code
+                      value={newModule.Filiere_codeFil ? filiere.find(item => item.codeFil === newModule.Filiere_codeFil) : null} // Récupérer l'objet filière correspondant au code
                       renderInput={(params) => <TextField {...params} sx={{height:'44px'}} />}
                       fullWidth
                       onChange={(_, filiere) => {setNewModule({...newModule, "Filiere_codeFil" : filiere ? filiere.codeFil : ""})}}

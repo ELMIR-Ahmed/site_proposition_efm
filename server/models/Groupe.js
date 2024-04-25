@@ -21,6 +21,8 @@ module.exports = (sequelize, DataTypes) => {
             onDelete: 'CASCADE',
             onUpdate: 'NO ACTION'
         });
+        Groupe.hasMany(models.Personnel_has_Module, {foreignKey : 'Groupe_idGrp', onDelete : 'CASCADE'})
+        Groupe.hasMany(models.Groupe_has_passageEFM, {foreignKey : 'Groupe_idGrp', as : 'GroupesPassage', onDelete : 'CASCADE'})
     };
 
     return Groupe;

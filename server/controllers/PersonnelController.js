@@ -74,10 +74,30 @@ const deletePersonnel = async (req, res) => {
     }
 }
 
+const deleteAllPersonnel = async (req, res) => {
+    try {
+        // const personnelHasModule = await Personnel_has_Module.findAll({})
+        // res.send({formateur : personnelHasModule})
+        const count = await Personnel.destroy({
+            where: {},
+            truncate: true
+        });
+
+        if (count === 0) {
+            return res.status(400).json({ message: 'Aucun formateur à supprimer !' });
+        }
+
+        res.status(200).json({ message: 'Formateurs supprimés avec succès !' });
+    } catch (error) {
+        res.status(500).json({ message: 'Une erreur est survenue lors de la suppression des formateurs : ' + error });
+    }
+}
+
 module.exports = {
     createPersonnel,
     getAllPersonnel,
     getPersonnelByCIN,
     updatePersonnel,
-    deletePersonnel
+    deletePersonnel,
+    deleteAllPersonnel
 };

@@ -2,6 +2,22 @@ import React, { useState } from 'react'
 import Layout from '../../../components/Layout'
 import { Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { styled } from '@mui/material/styles';
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
+import Papa from 'papaparse';
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
+
 
 function GestionModFilGrp(props) {
 
@@ -26,6 +42,15 @@ function GestionModFilGrp(props) {
     setIsActiveGrp(true)
     setIsActiveMod(false);
     setIsActiveFil(false);
+  }
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    if (files.length !== 2) {
+      alert("Veuillez selectionner les deux fichiers nécessaires !")
+      return;
+    }
+
   }
 
   return (
@@ -103,6 +128,32 @@ function GestionModFilGrp(props) {
                   }}
                 >
                   Groupe
+                </Button>
+              </div>
+            </div>
+            <div style={{width : "81%",display : "flex", justifyContent : "end", alignItems : "center"}}>
+              <div>
+                <Button
+                  onChange={handleFileChange}
+                  component="label"
+                  role={undefined}
+                  variant="outlined"
+                  tabIndex={-1}
+                  startIcon={<FileUploadOutlinedIcon />}
+                  sx={{
+                    color : "white", 
+                    borderColor : 'teal',
+                    width : "97%",
+                    height : "38px", 
+                    backgroundColor : "rgba(0, 128, 128, 0.8)",
+                    ":hover" : {
+                      backgroundColor : "rgba(0, 128, 128, 1)",
+                      borderColor : 'teal',
+                    }
+                  }}
+                >
+                  Importer
+                  <VisuallyHiddenInput type="file" multiple/>
                 </Button>
               </div>
             </div>

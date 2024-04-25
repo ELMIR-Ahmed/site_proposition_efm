@@ -26,10 +26,10 @@ function GestionEFMs(props) {
       <Layout>
         <div style={{padding : "30px"}}>
           <div style={{width : "100%", height : "60px",marginBottom : "20px", boxShadow: "0.5px 2px 4px 1px rgb(203, 203, 203)",marginTop : "-20px", display : "flex", justifyContent : "start", alignItems : "center", borderRadius : "3px"}}>
-            <div style={{width : '150px', height : "60px", display : "flex", justifyContent : "center", alignItems : "center", gap : '5px', marginLeft : "5px"}}>
+            <div style={{width : '250px', height : "60px", display : "flex", justifyContent : "center", alignItems : "center", gap : '5px', marginLeft : "5px"}}>
               <div 
                 style={{
-                  width : "100%",
+                  width : "50%",
                   borderTop : `5px solid ${isActiveListe ? "teal" : "gray"}`, 
                   height : "60px", 
                   paddingTop : "5px",
@@ -39,20 +39,22 @@ function GestionEFMs(props) {
                 <Button
                   onClick={() => {
                     handleActiveListe();
-                    navigate("/directeur/gestionFormateurs/Liste")
+                    navigate("/directeur/gestionEFM/Details")
                   }}
                   sx={{
+                    padding : 0 ,
                     ":hover" : {
                       color : "teal"
                     },
                     color : `${isActiveListe ? 'teal' : 'gray'}`
                   }}
                 >
-                  Liste
+                  <p style={{margin : "0 33px", textAlign : 'center'}}>Détails <br/> EFM</p>
                 </Button>
               </div>
               <div 
                 style={{
+                  width : "50%",
                   borderTop : `5px solid ${isActiveAjouter ? "teal" : "gray"}`, 
                   height : "60px", 
                   paddingTop : "5px",
@@ -62,16 +64,17 @@ function GestionEFMs(props) {
                 <Button 
                   onClick={() => {
                     handleIsActiveAjouter();
-                    navigate("/directeur/gestionFormateurs/Ajouter")
+                    // navigate("/directeur/gestionFormateurs/Ajouter")
                   }}                  
                   sx={{
+                    padding : 0,
                     ":hover" : {
                       color : "teal"
                     },
                     color : `${isActiveAjouter ? 'teal' : 'gray'}`
                   }}
                 >
-                  Ajouter
+                  <p style={{margin : 0}}>Liste Propositions</p>
                 </Button>
               </div>
             </div>

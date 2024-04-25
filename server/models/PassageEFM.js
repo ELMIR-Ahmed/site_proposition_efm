@@ -50,6 +50,10 @@ module.exports = (sequelize, DataTypes) => {
             onDelete: 'NO ACTION',
             onUpdate: 'NO ACTION'
         });
+        PassageEFM.hasMany(models.Groupe_has_passageEFM, {
+            foreignKey : 'PassageEFM_idPassage',
+            onDelete : 'CASCADE'
+        })
     };
 
     return PassageEFM;
