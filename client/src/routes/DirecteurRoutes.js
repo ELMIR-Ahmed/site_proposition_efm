@@ -13,6 +13,7 @@ import DescriptionModule from '../pages/directeur/gestionMGF/DescriptionModule';
 import ListeGroupe from '../pages/directeur/gestionMGF/ListeGroupe';
 import UpdateModule from '../pages/directeur/gestionMGF/UpdateModule';
 import UpdateFormateur from '../pages/directeur/gestionFormateurs/UpdateFormateur';
+import DetailsEFM from '../pages/directeur/gestionEFMs/DetailsEFM';
 
 const DirecteurRoutes = () => {
   return (
@@ -26,7 +27,7 @@ const DirecteurRoutes = () => {
       <Route path='/gestionModFilGrp/Groupe' element={<GestionModFilGrp component={<ListeGroupe/>}/>}/>
       <Route path='/gestionModFilGrp/Module/Description/:codeMod' element={<GestionModFilGrp component={<DescriptionModule/>}/>}/>
       <Route path='/gestionModFilGrp/Module/Update/:codeMod' element={<GestionModFilGrp component={<UpdateModule />}/>}/>
-      <Route path='/gestionEFM' element={<GestionEFMs/>}/>
+      <Route path='/gestionEFM/Details' element={<GestionEFMs component={<DetailsEFM/>} />}/>
       <Route path='/Audit' element={<Audit/>}/>
     </Routes>
   );

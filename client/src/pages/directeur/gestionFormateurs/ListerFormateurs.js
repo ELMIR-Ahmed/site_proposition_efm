@@ -16,6 +16,7 @@ import { styled } from '@mui/material';
 import { InputBase } from '@mui/material'
 
 
+
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   'label + &': {
     marginTop: theme.spacing(3),
@@ -69,9 +70,11 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 
 function ListerFromateurs() {
   const [formateurs, setFormateurs] = useState([])
+  const [filteredFormateur, setFilteredFormateur] = useState([])
+  const [searchValue, setSearchValue] = useState('')
   const navigate = useNavigate()
 
-  useEffect(()=>{
+  const getFormateurs = () => {
     const token = JSON.parse(localStorage.getItem('token')).token
     const config = {
       headers : {
@@ -86,13 +89,17 @@ function ListerFromateurs() {
     .catch((err) => {
       console.log(err.response)
     }) 
+  }
+
+  useEffect(()=>{
+    getFormateurs()
   }, [formateurs])
 
   function createData(CIN, Nom, Prénom, Fonction, Statut,  Matricule, Secteur) {
     return { CIN, Nom, Prénom, Fonction, Statut, Matricule, Secteur };
   }
 
-  const rows = formateurs.map((formateur) => (
+  const rows = filteredFormateur.map((formateur) => (
     createData(
       formateur.CIN,
       formateur.nom,
@@ -122,6 +129,32 @@ function ListerFromateurs() {
     })
   }
 
+  const handleDeleteAll = async () => {
+    const token = JSON.parse(localStorage.getItem('token')).token
+    const config = {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+    } 
+    await axios
+    .delete("http://localhost:7000/personnel", config)
+    .then(res => console.log(res.data))
+    .catch(err => console.log(err.response.data.message))
+    getFormateurs()
+  }
+
+  useEffect(() => {
+    const filtered = formateurs.filter((formateur) =>
+      formateur.prenom.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredFormateur(filtered);
+    
+  }, [searchValue, formateurs]);
+
+  // pour stocker la valeur recherchée dans searchValue state :
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
+  };
   return (
     <>
       <div style={{width : "100%", height : "50px",marginBottom : "10px", boxShadow: "0.5px 2px 4px 1px rgb(203, 203, 203)" ,display : "flex", justifyContent : "start", alignItems : "center", borderRadius : "3px"}}>
@@ -131,30 +164,14 @@ function ListerFromateurs() {
               <BootstrapInput
                 id="search"
                 placeholder="Recherche..." 
-                // onChange = {handleSearch}
-                // value={searchValue}
+                onChange = {handleSearch}
+                value={searchValue}
               />
             </FormControl>
           </div>
           <div style={{display : "flex", margin : '0 10px', gap : 6}}>
             <Button 
-              // onClick={handleOpen}
-              variant="outlined"
-              sx={{
-                height : "33px",
-                color : "teal",
-                borderColor : "teal",
-                ":hover" : {
-                  "backgroundColor" : "teal",
-                  "color" : "white",
-                  "borderColor" : "white"
-                }
-              }}
-            >
-              Ajouter
-            </Button>
-            <Button 
-              // onClick = {handleDeleteAll}
+              onClick = {handleDeleteAll}
               variant="outlined"
               sx={{
                 height : "33px",

@@ -21,6 +21,8 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'NO ACTION'
         });
+
+        Module.hasMany(models.Personnel_has_Module, {foreignKey : 'Module_codeModule', onDelete : 'CASCADE'})
     };
 
     return Module;

@@ -253,7 +253,7 @@ export default function Layout(props) {
             <ListItem key={"Gestion EFMs"} disablePadding sx={{ display: 'flex', }}>
               <ListItemButton
                 onClick={()=>{
-                  navigate("/directeur/gestionEFM")
+                  navigate("/directeur/gestionEFM/Details")
                 }}
                 sx={{
                   minHeight: 48,
