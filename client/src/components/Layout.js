@@ -122,11 +122,6 @@ export default function Layout(props) {
     setOpen(false);
   };
 
-  // useEffect(() => {
-  //   let personnelData = JSON.parse(localStorage.getItem('token'));
-  //   setPersonnelName(personnelData.nom)
-  //   setPersonnelRole(personnelData.fonction)
-  // }, [personnelName, personnelRole])
 
   return (
     <Box sx={{ display: 'flex'}}>
@@ -143,7 +138,6 @@ export default function Layout(props) {
               ...(open && { display: 'none' }),
             }}
           >
-            {/* <MenuIcon sx={{color : "rgba(67, 109, 119, 1)"}}/> */}
             <img src={ofpptIcon} alt="Logo OFPPT" width={50} height={48.2} style={{height : "50" , marginLeft : "-13px", paddingBottom:"10px"}} />
           </IconButton>
         </Toolbar>
@@ -156,7 +150,6 @@ export default function Layout(props) {
         </DrawerHeader>
         <Divider />
         <List>
-          {/* {['Statistiques', 'Gestion Formateurs', 'Gestion Mod/Grp/Filière', 'Gestion EFMs', 'Audit'].map((text, index) => ( */}
             <ListItem key={"Statistiques"} disablePadding sx={{ display: 'flex', }}>
               <ListItemButton
                 onClick={()=>{
@@ -237,9 +230,6 @@ export default function Layout(props) {
                   }}
                 >
                   <SchoolOutlinedIcon />
-                  {/*
-                  {index === 3 && <ContentPasteOutlinedIcon />}
-                  {index === 4 && <InventoryOutlinedIcon />} */}
                 </ListItemIcon>
                 <ListItemText 
                   primary={"Gestion Mod/Grp/Filière"} 
@@ -270,8 +260,6 @@ export default function Layout(props) {
                   }}
                 >
                   <ContentPasteOutlinedIcon />
-                  {/*
-                  {index === 4 && <InventoryOutlinedIcon />} */}
                 </ListItemIcon>
                 <ListItemText 
                   primary={"Gestion EFMs"} 
@@ -313,7 +301,6 @@ export default function Layout(props) {
               </ListItemButton>
             </ListItem>
             
-          {/* ))} */}
           <div style={{ display: 'flex', height: '85%', justifyContent: 'flex-end', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
               <Avatar 
@@ -357,7 +344,6 @@ export default function Layout(props) {
           </div>
         </List>
       </Drawer>
-      {/* render components here */}
       <Box 
         component="main" 
         sx={{ 

@@ -151,7 +151,6 @@ function ListerFromateurs() {
     
   }, [searchValue, formateurs]);
 
-  // pour stocker la valeur recherchée dans searchValue state :
   const handleSearch = (e) => {
     setSearchValue(e.target.value);
   };
@@ -220,16 +219,16 @@ function ListerFromateurs() {
                   <TableCell align="center">{row.Secteur}</TableCell>
                   <TableCell align="center">
                     <AssignmentOutlinedIcon 
-                      // onClick={()=>{
-                      //   handleAssignement(row.CIN)
-                      // }}
+                      onClick={()=>{
+                        navigate("/directeur/gestionFormateurs/Affecter/" + row.CIN)
+                      }}
                       style={{
                         margin : "0 7px", 
                         cursor : "pointer"
                       }}></AssignmentOutlinedIcon>
                     <EditOutlinedIcon 
                       onClick={()=>{
-                        navigate("/directeur/gestionFormateurs/Liste/" + row.CIN)
+                        navigate("/directeur/gestionFormateurs/Update/" + row.CIN)
                       }}
                       style={{
                         margin : "0 4px", 

@@ -4,13 +4,9 @@ import Login from './pages/Login';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import DirecteurRoutes from './routes/DirecteurRoutes';
 import NoteFound from './pages/NoteFound';
+import FormateurRoutes from './routes/FormateurRoutes';
 
 function App() {
-  const [token, setToken] = useState(null)
-
-  useEffect(() => {
-    setToken(JSON.parse(localStorage.getItem('token')))
-  }, [])
 
   return (
     <div className="App">
@@ -18,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} /> 
           <Route path="/directeur/*" element={<DirecteurRoutes />} />
+          <Route path="/formateur/*" element={<FormateurRoutes/>} />
           <Route path='*' element={<NoteFound/>} />
         </Routes>
       </BrowserRouter>

@@ -1,39 +1,80 @@
 const {Personnel_has_Module, Personnel, Module, Groupe} = require('../models')
 
+// const createAssignment = async (req, res) => {
+//   try {
+//     const {personnel_cin, ressources} = req.body;
+
+//     const personnel = await Personnel.findByPk(personnel_cin);
+//     if (!personnel) {
+//         return res.status(400).json({ message: 'Personnel non trouvé.' });
+//     }
+
+//     // itérer sur le tableau des ressouces (modules, filiere, groupe) envoyé du coté client :
+//     for(let i = 0 ; i < ressources.length ; i++){
+//       const {code_module, id_groupe} = ressources[i];
+
+//       const moduleExists = await Module.findByPk(code_module);
+//       const groupeExists = await Groupe.findByPk(id_groupe);
+
+  
+//       if ( (moduleExists === null) || (groupeExists === null) ) {
+//         return res.status(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
+//       }
+
+//       await Personnel_has_Module.create({
+//         Personnel_CIN: personnel_cin,
+//         Module_codeModule: code_module,
+//         Groupe_idGrp: id_groupe
+//       })
+      
+//     }
+//     res.status(201).json({message : 'assignation réussite !'});
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+
 const createAssignment = async (req, res) => {
   try {
-    const {personnel_cin, ressources} = req.body;
+    const { personnel_cin, ressources } = req.body;
 
     const personnel = await Personnel.findByPk(personnel_cin);
     if (!personnel) {
-        return res.status(400).json({ message: 'Personnel non trouvé.' });
+      return res.status(400).json({ message: 'Personnel non trouvé.' });
     }
 
-    // itérer sur le tableau des ressouces (modules, filiere, groupe) envoyé du coté client :
-    for(let i = 0 ; i < ressources.length ; i++){
-      const {code_module, id_groupe} = ressources[i];
+    // itérer sur le tableau des ressources (modules et groupes) envoyé du côté client :
+    for (let i = 0; i < ressources.length; i++) {
+      const { codeModule, groupes } = ressources[i];
 
-      const moduleExists = await Module.findByPk(code_module);
-      const groupeExists = await Groupe.findByPk(id_groupe);
-
-  
-      if ( (moduleExists === null) || (groupeExists === null) ) {
-        return res.status(400).json({ message : "Une ou plusieurs instances associées ne sont pas trouvées." })
+      const moduleExists = await Module.findByPk(codeModule);
+      if (!moduleExists) {
+        return res.status(400).json({ message: `Module ${codeModule} non trouvé.` });
       }
 
-      await Personnel_has_Module.create({
-        Personnel_CIN: personnel_cin,
-        Module_codeModule: code_module,
-        Groupe_idGrp: id_groupe
-      })
-      
+      // itérer sur les groupes associés au module
+      for (let j = 0; j < groupes.length; j++) {
+        const { idGrp } = groupes[j];
+
+        const groupeExists = await Groupe.findByPk(idGrp);
+        if (!groupeExists) {
+          return res.status(400).json({ message: `Groupe ${idGrp} non trouvé.` });
+        }
+
+        // Créer l'association
+        await Personnel_has_Module.create({
+          Personnel_CIN: personnel_cin,
+          Module_codeModule: codeModule,
+          Groupe_idGrp: idGrp
+        });
+      }
     }
-    res.status(201).json({message : 'assignation réussite !'});
+
+    res.status(201).json({ message: 'Assignation réussie !' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Ereeru => ${error}` });
   }
 }
-
 
 
 const getAssignmentsByPersonnel = async (req, res) => {

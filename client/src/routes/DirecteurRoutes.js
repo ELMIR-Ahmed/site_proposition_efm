@@ -14,20 +14,24 @@ import ListeGroupe from '../pages/directeur/gestionMGF/ListeGroupe';
 import UpdateModule from '../pages/directeur/gestionMGF/UpdateModule';
 import UpdateFormateur from '../pages/directeur/gestionFormateurs/UpdateFormateur';
 import DetailsEFM from '../pages/directeur/gestionEFMs/DetailsEFM';
+import AffecterModules from '../pages/directeur/gestionFormateurs/AffecterModules';
+import AfficherSujets from '../pages/directeur/gestionEFMs/AfficherSujets'
 
 const DirecteurRoutes = () => {
   return (
     <Routes>
       <Route path='/statistique' element={<Statistiques />} />
       <Route path='/gestionFormateurs/Liste' element={<GestionFor isActive={true} component={<ListerFromateurs/>}/>}/>
-      <Route path='/gestionFormateurs/Liste/:CIN' element={<GestionFor component={<UpdateFormateur/>}/>}/>
+      <Route path='/gestionFormateurs/Update/:CIN' element={<GestionFor component={<UpdateFormateur/>}/>}/>
       <Route path='/gestionFormateurs/Ajouter' element={<GestionFor component={<AjouterFormateur/>}/>}/>
+      <Route path='/gestionFormateurs/Affecter/:CIN' element={<AffecterModules/>}/>
       <Route path='/gestionModFilGrp/Filiere' element={<GestionModFilGrp component={<ListerFiliere/>}/>}/>
       <Route path='/gestionModFilGrp/Module' element={<GestionModFilGrp component={<ListerModule/>}/>}/>
       <Route path='/gestionModFilGrp/Groupe' element={<GestionModFilGrp component={<ListeGroupe/>}/>}/>
       <Route path='/gestionModFilGrp/Module/Description/:codeMod' element={<GestionModFilGrp component={<DescriptionModule/>}/>}/>
       <Route path='/gestionModFilGrp/Module/Update/:codeMod' element={<GestionModFilGrp component={<UpdateModule />}/>}/>
       <Route path='/gestionEFM/Details' element={<GestionEFMs component={<DetailsEFM/>} />}/>
+      <Route path='/gestionEFM/ListePropositions' element={<GestionEFMs component={<AfficherSujets/>} />}/>
       <Route path='/Audit' element={<Audit/>}/>
     </Routes>
   );

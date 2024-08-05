@@ -28,7 +28,12 @@ function Login() {
   useEffect(()=>{
     const isLogged = JSON.parse(localStorage.getItem('token'))
     if(isLogged) {
-      navigate('/directeur/statistique')
+      if (isLogged.fonction === 'directeur') {
+        navigate('/directeur/statistique')
+      }
+      if (isLogged.fonction === 'formateur') {
+        navigate('/formateur')
+      }
     }
     navigate('/')
   }, [navigate])
@@ -40,7 +45,14 @@ function Login() {
       localStorage.setItem('token', JSON.stringify(res.data))
       localStorage.setItem('isLogged', 'true')
       console.log(JSON.parse(localStorage.getItem('token')))
-      navigate('/directeur/statistique')
+      if(JSON.parse(localStorage.getItem('token')).fonction === 'directeur')
+      {
+        navigate('/directeur/statistique')
+      }
+      if(JSON.parse(localStorage.getItem('token')).fonction === 'formateur')
+        {
+          navigate('/formateur/')
+        }
     })
     .catch((err) => {
       alert(err.response.data.message)

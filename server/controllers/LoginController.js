@@ -25,7 +25,7 @@ const Login = async (req, res) => {
       )
     }
     const token = AccessToken(CIN, personnel.fonction)
-    res.status(200).send({"token" : token, "fonction" : personnel.fonction, "nom" : personnel.nom, "prenom" : personnel.prenom})
+    res.status(200).send({"token" : token, "fonction" : personnel.fonction, "nom" : personnel.nom, "prenom" : personnel.prenom, "CIN" : personnel.CIN})
 
   } catch (error) {
     res.status(500).json({ "message" : "Une erreur est survenue lors de l'authentification !"})

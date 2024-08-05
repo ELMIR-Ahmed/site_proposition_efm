@@ -2,57 +2,45 @@ module.exports = (sequelize, DataTypes) => {
     const Proposition = sequelize.define('Proposition', {
         idProp: {
             type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true
-        },
-        nbrProposisions: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        sujet1: {
-            type: DataTypes.BLOB,
-            allowNull: false
-        },
-        sujet2: {
-            type: DataTypes.BLOB,
-            allowNull: false
-        },
-        sujet3: {
-            type: DataTypes.BLOB,
-            allowNull: false
-        },
-        sujet4: {
-            type: DataTypes.BLOB,
+            primaryKey: true,
+            autoIncrement: true,
             allowNull: false
         },
         dateEnvoi: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true // Ajout de allowNull: false si nécessaire
         },
         valide: {
             type: DataTypes.ENUM('VRAI', 'FAUX'),
-            allowNull: false
+            allowNull: true // Ajout de allowNull: false si nécessaire
         },
         dateValidation: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         },
-        observation: DataTypes.STRING(3000)
-    },{
-        tableName : "proposition",
+        observation: {
+            type: DataTypes.STRING(3000),
+            allowNull : true
+        },
+        Personnel_CIN: {
+            type: DataTypes.STRING, // Chaîne de caractères
+            allowNull: true // Définir à true si cette valeur peut être nulle
+        },
+        Module_codeModule: {
+            type: DataTypes.STRING, // Chaîne de caractères
+            allowNull: true // Définir à true si cette valeur peut être nulle
+        }
+    }, {
+        tableName: 'proposition',
         timestamps: false // Désactiver les horodatages automatiques
     });
 
     Proposition.associate = (models) => {
         Proposition.belongsTo(models.Module, {
             foreignKey: 'Module_codeModule',
-            onDelete: 'NO ACTION',
-            onUpdate: 'NO ACTION'
         });
         Proposition.belongsTo(models.Personnel, {
             foreignKey: 'Personnel_CIN',
-            onDelete: 'NO ACTION',
-            onUpdate: 'NO ACTION'
         });
     };
 
